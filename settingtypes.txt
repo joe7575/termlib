@@ -1,0 +1,2 @@
+# For testing purpuses only
+termlib_testingblock_enabled (enable test terminal) bool false
