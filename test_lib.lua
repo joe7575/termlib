@@ -20,6 +20,7 @@ dofile(MP.."/misc_helpers.lua")
 dofile(MP.."/vector.lua")
 dofile(MP.."/item.lua")
 dofile(MP.."/misc.lua")
+dofile(MP.."/meta.lua")
 
 minetest = core
 -------------------------------------------------------------------------------
@@ -28,6 +29,9 @@ function minetest.get_gametime()
 	return 0
 end
 
+function minetest.get_gametime()
+	return 0
+end
 termlib = {}
 
 dofile("./lib.lua")  -- helper functions

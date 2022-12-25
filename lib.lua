@@ -44,35 +44,39 @@ function termlib.function_keys(fields)
 	return fields
 end
 
-function termlib.historybuffer_add(pos, s)
-	local mem = pdp13.get_mem(pos)
-	mem.trm_hisbuf = mem.trm_hisbuf or {}
+function termlib.historybuffer_add(mem, s)
+	mem.trm_lHisbuf = mem.trm_lHisbuf or {}
+	mem.trm_tHisbuf = mem.trm_tHisbuf or {}
 	
 	if #s > 2 then
-		table.insert(mem.trm_hisbuf, s)
-		if #mem.trm_hisbuf > BUFFER_DEPTH then
-			table.remove(mem.trm_hisbuf, 1)
+		if not mem.trm_tHisbuf[s] then
+			table.insert(mem.trm_lHisbuf, s)
+			mem.trm_tHisbuf[s] = true
+			if #mem.trm_lHisbuf > BUFFER_DEPTH then
+				mem.trm_tHisbuf[mem.trm_lHisbuf[1]] = nil
+				table.remove(mem.trm_lHisbuf, 1)
+			end
+			mem.trm_lHisbuf_idx = #mem.trm_lHisbuf + 1
+		else
+			mem.trm_lHisbuf_idx = mem.trm_lHisbuf_idx + 1
 		end
-		mem.trm_hisbuf_idx = #mem.trm_hisbuf + 1
 	end
 end
 
-function termlib.historybuffer_priv(pos)
-	local mem = pdp13.get_mem(pos)
-	mem.trm_hisbuf = mem.trm_hisbuf or {}
-	mem.trm_hisbuf_idx = mem.trm_hisbuf_idx or 1
+function termlib.historybuffer_priv(mem)
+	mem.trm_lHisbuf = mem.trm_lHisbuf or {}
+	mem.trm_lHisbuf_idx = mem.trm_lHisbuf_idx or 1
 	
-	mem.trm_hisbuf_idx = math.max(1, mem.trm_hisbuf_idx - 1)
-	return mem.trm_hisbuf[mem.trm_hisbuf_idx]
+	mem.trm_lHisbuf_idx = math.max(1, mem.trm_lHisbuf_idx - 1)
+	return mem.trm_lHisbuf[mem.trm_lHisbuf_idx]
 end
 
-function termlib.historybuffer_next(pos)
-	local mem = pdp13.get_mem(pos)
-	mem.trm_hisbuf = mem.trm_hisbuf or {}
-	mem.trm_hisbuf_idx = mem.trm_hisbuf_idx or 1
+function termlib.historybuffer_next(mem)
+	mem.trm_lHisbuf = mem.trm_lHisbuf or {}
+	mem.trm_lHisbuf_idx = mem.trm_lHisbuf_idx or 1
 	
-	mem.trm_hisbuf_idx = math.min(#mem.trm_hisbuf, mem.trm_hisbuf_idx + 1)
-	return mem.trm_hisbuf[mem.trm_hisbuf_idx]
+	mem.trm_lHisbuf_idx = math.min(#mem.trm_lHisbuf, mem.trm_lHisbuf_idx + 1)
+	return mem.trm_lHisbuf[mem.trm_lHisbuf_idx]
 end
 
 function termlib.get_user_button_string(meta, num, default)
