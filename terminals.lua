@@ -91,13 +91,13 @@ minetest.register_node("termlib:terminal1", {
 		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec", formspec1(pos))
 		meta:set_string("owner", placer:get_player_name())
+		meta:set_string("infotext","Termlib Terminal1")
 	end,
 
 	on_receive_fields = function(pos, formname, fields, player)
 		local mem = get_mem(pos)
 		term:on_receive_fields(pos, formname, fields, player, mem, command_handler)
 		M(pos):set_string("formspec", formspec1(pos))
-		--print(formspec1(pos))
 	end,
 
 	after_dig_node = function(pos, oldnode, oldmetadata)
@@ -108,6 +108,7 @@ minetest.register_node("termlib:terminal1", {
 	use_texture_alpha = "clip",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
+	stack_max = 1,
 	groups = {choppy=2, cracky=2, crumbly=2},
 	is_ground_content = false
 })
@@ -148,13 +149,13 @@ minetest.register_node("termlib:terminal2", {
 		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec", formspec2(pos))
 		meta:set_string("owner", placer:get_player_name())
+		meta:set_string("infotext","Termlib Terminal2")
 	end,
 
 	on_receive_fields = function(pos, formname, fields, player)
 		local mem = get_mem(pos)
 		term:on_receive_fields(pos, formname, fields, player, mem, command_handler)
 		M(pos):set_string("formspec", formspec2(pos))
-		--print(formspec2(pos))
 	end,
 
 	after_dig_node = function(pos, oldnode, oldmetadata)
@@ -165,6 +166,44 @@ minetest.register_node("termlib:terminal2", {
 	use_texture_alpha = "clip",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
+	stack_max = 1,
 	groups = {choppy=2, cracky=2, crumbly=2},
 	is_ground_content = false
 })
+
+minetest.register_node("termlib:terminal3", {
+	description = "Terminal3",
+	tiles = {
+		-- up, down, right, left, back, front
+		'termlib_terminal3_top.png',
+		'termlib_terminal3_top.png',
+		'termlib_terminal3_side.png',
+		'termlib_terminal3_side.png',
+		'termlib_terminal3_side.png',
+		"termlib_terminal3_front.png",
+	},
+	after_place_node = function(pos, placer)
+		local mem = get_mem(pos)
+		term:init_block(pos, mem)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("formspec", formspec1(pos))
+		meta:set_string("owner", placer:get_player_name())
+		meta:set_string("infotext","Termlib Terminal3")
+	end,
+
+	on_receive_fields = function(pos, formname, fields, player)
+		local mem = get_mem(pos)
+		term:on_receive_fields(pos, formname, fields, player, mem, command_handler)
+		M(pos):set_string("formspec", formspec1(pos))
+	end,
+
+	after_dig_node = function(pos, oldnode, oldmetadata)
+		del_mem(pos)
+	end,
+
+	paramtype2 = "facedir",
+	stack_max = 1,
+	groups = {choppy=2, cracky=2, crumbly=2},
+	is_ground_content = false
+})
+
