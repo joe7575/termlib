@@ -15,17 +15,26 @@ local Term = termlib.Term
 local M = minetest.get_meta
 
 local SCREENSAVER_TIME = 60 * 5
+local HELP = [[Local commands (start with '@'):
+- Clear screen with '@cls'
+- Output this message with '@help'
+- Switch to public use of buttons with '@pub'
+- Switch to private use of buttons with '@priv'
+- Program a user button with
+  '@set <button-num> <button-text> <command>'
+]]
 
 function Term:new(attr)
 	local o = {
-		size_x = attr.size_x or 64,
-		size_y = attr.size_y or 24,
+		size_x = attr.size_x or 60,
+		size_y = attr.size_y or 20,
 		text_size = attr.text_size or 0,
 		term_size = attr.term_size or "0,0;12,7.5",
 		text_color = attr.text_color or "#FFFFFF",
 		background_color = attr.background_color or "#000000",
 		font = attr.font or "mono",
-		help_text = attr.help_text or "Sorry, no help available.",
+		history_enabled = attr.history_enabled or true,
+		help_text = attr.help_text or HELP,
 	}
 	setmetatable(o, self)
 	self.__index = self
@@ -91,7 +100,7 @@ function Term:ctrl_char(pos, mem, val)
 		self:new_line(pos, mem)
 		mem.trm_lines[mem.trm_cursor_row] = ""
 		return true
-	elseif val == 12 then  -- carriage return ('\r')
+	elseif val == 13 then  -- carriage return ('\r')
 		mem.trm_lines[mem.trm_cursor_row] = ""
 		return true
 	elseif val == 27 then  -- escape
@@ -144,6 +153,7 @@ end
 
 -- Function returns true, if screen needs to be updated
 function Term:put_char(pos, mem, val)
+	--print("put_char", val)
 	if mem.trm_escaped then
 		local res = self:escape_sequence(pos, mem, val)
 		return mem.trm_ttl > minetest.get_gametime() and res
@@ -162,7 +172,8 @@ end
 function Term:put_string(pos, mem, s)
 	local res = false
 	for i = 1, string.len(s) do
-		res = res or self:put_char(pos, mem, s:byte(i))
+		local tmp = self:put_char(pos, mem, s:byte(i))
+		res = res or tmp
 	end
 	return res
 end
@@ -221,7 +232,7 @@ function Term:fs_input_with_function_keys(pos, mem, x, y)
 		"button[2.8,0;1.3,0.6;f2;F2]" ..
 		"button[4.2,0;1.3,0.6;f3;F3]" ..
 		"button[5.6,0;1.3,0.6;f4;F4]" ..
-		"button[7.0,0;1.7,0.6;close;Close]" ..
+		"button_exit[7.0,0;1.7,0.6;close;Close]" ..
 		"style_type[field;textcolor=#FFFFFF]" ..
 		"field[0,0.7;6.9,0.8;command;;" .. minetest.formspec_escape(mem.trm_command) .. "]" ..
 		"button[7.0,0.7;1.7,0.8;enter;Enter]" ..
@@ -258,23 +269,20 @@ function Term:internal_commands(pos, mem, meta, command)
 		self:put_string(pos, mem, self.help_text)
 	elseif command == "@pub" then
 		meta:set_int("public", 2)
-		self:put_string(pos, mem, "$ "..command)
-		self:put_string(pos, mem, "Switched to public mode!")
+		self:add_line(pos, mem, "Switched to public mode!")
 	elseif command == "@prot" then
 		meta:set_int("public", 1)
-		self:put_string(pos, mem, "$ "..command)
-		self:put_string(pos, mem, "Switched to protected mode!")
+		self:add_line(pos, mem, "Switched to protected mode!")
 	elseif command == "@priv" then
 		meta:set_int("public", 0)
-		self:put_string(pos, mem, "$ "..command)
-		self:put_string(pos, mem, "Switched to private mode!")
+		self:add_line(pos, mem, "Switched to private mode!")
 	else
 		local bttn_num, label, cmnd = command:match('^@set%s+([1-9])%s+([%w_]+)%s+(.+)$')
 		if bttn_num and label and cmnd then
 			meta:set_string("bttn_text"..bttn_num, label)
 			meta:set_string("bttn_cmnd"..bttn_num, cmnd)
 		else
-			print("cmd: " .. command)
+			self:add_line(pos, mem, "Unknown command!")
 		end
 	end
 	
@@ -289,7 +297,7 @@ function Term:on_receive_fields(pos, formname, fields, player, mem, command_hand
 		public == 0 and player:get_player_name() == meta:get_string("owner") then
 
 		fields = termlib.function_keys(fields)
-		print("on_receive_fields", mem.trm_input)
+		--print("on_receive_fields", mem.trm_input)
 		mem.trm_ttl = minetest.get_gametime() + SCREENSAVER_TIME
 
 		if fields.key_enter_field or fields.enter then
@@ -301,12 +309,18 @@ function Term:on_receive_fields(pos, formname, fields, player, mem, command_hand
 			else
 				command_handler(pos, mem, mem.trm_input)
 			end
-			termlib.historybuffer_add(mem, mem.trm_input)
+			if self.history_enabled then
+				termlib.historybuffer_add(mem, mem.trm_input)
+			end
 			mem.trm_command = ""
 		elseif fields.key_up then
-			mem.trm_command = termlib.historybuffer_priv(mem)
+			if self.history_enabled then
+				mem.trm_command = termlib.historybuffer_priv(mem)
+			end
 		elseif fields.key_down then
-			mem.trm_command = termlib.historybuffer_next(mem)
+			if self.history_enabled then
+				mem.trm_command = termlib.historybuffer_next(mem)
+			end
 		elseif fields.larger then
 			mem.trm_text_size = math.min((mem.trm_text_size or 0) + 1, 8)
 		elseif fields.smaller then
@@ -315,15 +329,42 @@ function Term:on_receive_fields(pos, formname, fields, player, mem, command_hand
 			mem.trm_active = false
 		elseif fields.exit then
 			mem.trm_input = fields.command or ""
-		elseif fields.bttn1 then command_handler(pos, mem, meta:get_string("bttn_cmnd1"))
-		elseif fields.bttn2 then command_handler(pos, mem, meta:get_string("bttn_cmnd2"))
-		elseif fields.bttn3 then command_handler(pos, mem, meta:get_string("bttn_cmnd3"))
-		elseif fields.bttn4 then command_handler(pos, mem, meta:get_string("bttn_cmnd4"))
-		elseif fields.bttn5 then command_handler(pos, mem, meta:get_string("bttn_cmnd5"))
-		elseif fields.bttn6 then command_handler(pos, mem, meta:get_string("bttn_cmnd6"))
-		elseif fields.bttn7 then command_handler(pos, mem, meta:get_string("bttn_cmnd7"))
-		elseif fields.bttn8 then command_handler(pos, mem, meta:get_string("bttn_cmnd8"))
-		elseif fields.bttn9 then command_handler(pos, mem, meta:get_string("bttn_cmnd9"))
+		elseif fields.bttn1 then 
+			local cmnd = meta:get_string("bttn_cmnd1")
+			self:add_line(pos, mem, "$ " .. cmnd)
+			command_handler(pos, mem, cmnd)
+		elseif fields.bttn2 then
+			local cmnd = meta:get_string("bttn_cmnd2")
+			self:add_line(pos, mem, "$ " .. cmnd)
+			command_handler(pos, mem, cmnd)
+		elseif fields.bttn3 then
+			local cmnd = meta:get_string("bttn_cmnd3")
+			self:add_line(pos, mem, "$ " .. cmnd)
+			command_handler(pos, mem, cmnd)
+		elseif fields.bttn4 then
+			local cmnd = meta:get_string("bttn_cmnd4")
+			self:add_line(pos, mem, "$ " .. cmnd)
+			command_handler(pos, mem, cmnd)
+		elseif fields.bttn5 then
+			local cmnd = meta:get_string("bttn_cmnd5")
+			self:add_line(pos, mem, "$ " .. cmnd)
+			command_handler(pos, mem, cmnd)
+		elseif fields.bttn6 then 
+			local cmnd = meta:get_string("bttn_cmnd6")
+			self:add_line(pos, mem, "$ " .. cmnd)
+			command_handler(pos, mem, cmnd)
+		elseif fields.bttn7 then
+			local cmnd = meta:get_string("bttn_cmnd7")
+			self:add_line(pos, mem, "$ " .. cmnd)
+			command_handler(pos, mem, cmnd)
+		elseif fields.bttn8 then
+			local cmnd = meta:get_string("bttn_cmnd8")
+			self:add_line(pos, mem, "$ " .. cmnd)
+			command_handler(pos, mem, cmnd)
+		elseif fields.bttn9 then
+			local cmnd = meta:get_string("bttn_cmnd9")
+			self:add_line(pos, mem, "$ " .. cmnd)
+			command_handler(pos, mem, cmnd)
 		end
 	end
 end

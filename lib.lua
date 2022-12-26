@@ -18,7 +18,7 @@ local S2P = minetest.string_to_pos
 local BUFFER_DEPTH = 10
 
 function termlib.bell(pos)
-	minetest.sound_play("vm16_beep", {
+	minetest.sound_play("termlib_beep", {
 		pos = pos,
 		gain = 1,
 		max_hear_distance = 5})

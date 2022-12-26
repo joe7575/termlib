@@ -13,20 +13,9 @@
 local M = minetest.get_meta
 local storage = minetest.get_mod_storage()
 
-local HELP = [[        #### Test Terminal ####
-Local commands (start with '@'):
-- Clear screen with '@cls'
-- Output this message with '@help'
-- Switch to public use of buttons with '@pub'
-- Switch to private use of buttons with '@priv'
-- Program a user button with
-  '@set <button-num> <button-text> <command>'
-]]
-
 local term = termlib.Term:new({
 	size_x = 60,
 	size_y = 20,
-	help_text = HELP,
 })
 
 local Data = minetest.deserialize(storage:get_string("Data")) or {}
