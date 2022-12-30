@@ -2,15 +2,14 @@
 
 **A Library for Minetest text terminals**
 
-This mod is not useful for its own. It does not even have any nodes.
-It only comes with a few test nodes to play around with.
+This mod comes with a example terminal to be used with TechAge or
+Beduino Controllers.
 
 
 ### Features
 
 - Screen memory handling, configurable size
-- Optional function keys (F1 - F4)
-- Optional programmable user buttons
+- Programmable function keys (F1 - F8)
 - Command history buffer
 - Escape sequences for clear screen, goto line, ...
 
@@ -23,14 +22,11 @@ Code: Licensed under the GNU GPL version 3 or later. See LICENSE.txt
 
 Textures: CC BY-SA 3.0
 
-Sounds:
-- "ta4_jetpack_on.ogg" Copyright by lextrack CC0 1.0 (https://freesound.org/s/346323/)
-- "ta4_jetpack_alarm.ogg" Copyright by Tim_Verberne CC0 1.0 (https://freesound.org/s/514079/)
-
 
 ### Dependencies
 
 Required: none
+Optional: techage, beduino
 
 
 ### History

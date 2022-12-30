@@ -14,13 +14,12 @@ termlib = {}
 
 -- Version for compatibility checks, see readme.md
 termlib.version = 1.0
+termlib.S = minetest.get_translator("termlib")
 
 local MP = minetest.get_modpath("termlib")
-dofile(MP.."/lib.lua")  -- helper functions
-dofile(MP.."/api.lua")  -- interface functions
 
--- Only for testing/demo purposes
-if minetest.settings:get_bool("termlib_testingblock_enabled") == true then
-	dofile(MP .. "/terminals.lua")
-end
+dofile(MP .. "/lib.lua")  -- Helper functions
+dofile(MP .. "/api.lua")  -- Interface functions
+dofile(MP .. "/commands.lua")  -- Internal commands
+dofile(MP .. "/terminal.lua")  -- Example implementation
 

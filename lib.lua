@@ -24,24 +24,70 @@ function termlib.bell(pos)
 		max_hear_distance = 5})
 end
 
-function termlib.function_keys(fields)
+function termlib.get_bttn_string(meta, num, default)
+	local s = meta:get_string("bttn_text"..num)
+	if not s or s == "" then
+		return default
+	end
+	return s
+end
+
+function termlib.func_keys(fields)
 	if fields.esc then
-		fields.command = "\027"
+		fields.command = ""
 		fields.enter = true
 	elseif fields.f1 then
-		fields.command = "\028"
+		fields.command = "\128"
 		fields.enter = true
 	elseif fields.f2 then
-		fields.command = "\029"
+		fields.command = "\129"
 		fields.enter = true
 	elseif fields.f3 then
-		fields.command = "\030"
+		fields.command = "\130"
 		fields.enter = true
 	elseif fields.f4 then
-		fields.command = "\031"
+		fields.command = "\131"
+		fields.enter = true
+	elseif fields.f5 then
+		fields.command = "\132"
+		fields.enter = true
+	elseif fields.f6 then
+		fields.command = "\133"
+		fields.enter = true
+	elseif fields.f7 then
+		fields.command = "\134"
+		fields.enter = true
+	elseif fields.f8 then
+		fields.command = "\135"
 		fields.enter = true
 	end
 	return fields
+end
+
+function termlib.func_key_bttns(pos, mem, x, y)
+	local meta = minetest.get_meta(pos)
+	local t = {}
+	for i = 1, 8 do
+		local x = (i - 1) * 1.5
+		local text = termlib.get_bttn_string(meta, i, "F" .. i)
+		t[#t+1] = "button[" .. x .. "," .. y .. ";1.5,0.7;f" .. i .. ";" .. text .. "]"
+	end
+	return "container[" .. x .. "," .. y .. "]" ..
+		table.concat(t, "") ..
+		"container_end[]"
+end
+
+function termlib.command_handler(self, pos, meta, mem, command, player)
+	command = string.sub(command or "", 1, self.size_x)
+	command = string.trim(command)
+	local cmnd, payload = command:match('^([%w_@]+)%s*(.*)$')
+	if self.registered_commands[cmnd] then
+		self:add_line(pos, mem, "$ " .. command)
+		self.registered_commands[cmnd](self, pos, meta, mem, cmnd, payload, player)
+		return command
+	else
+		self.external_commands(self, pos, meta, mem, command, player)
+	end
 end
 
 function termlib.historybuffer_add(mem, s)
@@ -77,12 +123,4 @@ function termlib.historybuffer_next(mem)
 	
 	mem.trm_lHisbuf_idx = math.min(#mem.trm_lHisbuf, mem.trm_lHisbuf_idx + 1)
 	return mem.trm_lHisbuf[mem.trm_lHisbuf_idx]
-end
-
-function termlib.get_user_button_string(meta, num, default)
-	local s = meta:get_string("bttn_text"..num)
-	if not s or s == "" then
-		return default
-	end
-	return s
 end
