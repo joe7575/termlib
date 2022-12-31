@@ -25,3 +25,6 @@ dofile(MP .. "/terminal.lua")  -- Example implementation
 if minetest.global_exists("techage") then
 	dofile(MP .. "/techage.lua")  -- techage adaption
 end
+if minetest.global_exists("sl_controller") then
+	dofile(MP .. "/techpack.lua")  -- techpack adaption
+end
