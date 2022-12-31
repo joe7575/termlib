@@ -112,9 +112,9 @@ techage.lua_ctlr.register_action("put_str", {
 minetest.register_craft({
 	output = "termlib:terminal1",
 	recipe = {
-		{"", "techage:ta4_display", ""},
-		{"dye:black", "techage:ta4_wlanchip", "default:copper_ingot"},
-		{"", "techage:aluminum", ""},
+		{"", "techage:ta4_terminal", ""},
+		{"", "techage:ta4_ramchip", ""},
+		{"", "", ""},
 	},
 })
 

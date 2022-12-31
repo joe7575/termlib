@@ -61,7 +61,7 @@ end
 
 ### License
 
-Copyright (C)2022-2023 Joachim Stolberg
+Copyright (C) 2022-2023 Joachim Stolberg
 
 Code: Licensed under the GNU GPL version 3 or later. See LICENSE.txt
 
