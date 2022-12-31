@@ -2,7 +2,7 @@
 
 **A Library for Minetest text terminals**
 
-This mod comes with a example terminal to be used with TechAge or
+This mod comes with a example terminal to be used with TechAge, TechPack, or
 Beduino Controllers.
 
 ![screenshot_1](./screenshot_1.png)
@@ -17,7 +17,7 @@ Beduino Controllers.
 - Command history buffer
 - Escape sequences for clear screen, goto line, ...
 
-### Techage Lua Controller Example
+### TechAge/TechPack Lua Controller Example
 
 This is the code for the screenshot 2.
 
@@ -71,9 +71,10 @@ Textures: CC BY-SA 3.0
 ### Dependencies
 
 Required: none
-Optional: techage, beduino
+Optional: techage, techpack (sl_conttroller), beduino
 
 
 ### History
 
+- 2022-12-31  V1.01  * Add support for TechPack sl_controller
 - 2022-12-26  V1.00  * First version
