@@ -36,28 +36,28 @@ function termlib.func_keys(fields)
 	if fields.esc then
 		fields.command = ""
 		fields.enter = true
-	elseif fields.bttn1 then
+	elseif fields.bttn1 == "F1" then
 		fields.command = "\128"
 		fields.enter = true
-	elseif fields.bttn2 then
+	elseif fields.bttn2 == "F2" then
 		fields.command = "\129"
 		fields.enter = true
-	elseif fields.bttn3 then
+	elseif fields.bttn3 == "F3" then
 		fields.command = "\130"
 		fields.enter = true
-	elseif fields.bttn4 then
+	elseif fields.bttn4 == "F4" then
 		fields.command = "\131"
 		fields.enter = true
-	elseif fields.bttn5 then
+	elseif fields.bttn5 == "F5" then
 		fields.command = "\132"
 		fields.enter = true
-	elseif fields.bttn6 then
+	elseif fields.bttn6 == "F6" then
 		fields.command = "\133"
 		fields.enter = true
-	elseif fields.bttn7 then
+	elseif fields.bttn7 == "F7" then
 		fields.command = "\134"
 		fields.enter = true
-	elseif fields.bttn8 then
+	elseif fields.bttn8 == "F8" then
 		fields.command = "\135"
 		fields.enter = true
 	end
