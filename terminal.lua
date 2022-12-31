@@ -24,7 +24,7 @@ local term = termlib.Term:new({
 if minetest.global_exists("techage") then
 	term:register_command("@connect", 
 		"- Connect to a CPU/machine with '@connect <number>'",
-		function(self, pos, meta, nvm, cmnd, number)
+		function(self, pos, nvm, cmnd, number)
 			if number then
 				local owner = M(pos):get_string("owner")
 				if techage.not_protected(number, owner, owner) then
@@ -33,18 +33,27 @@ if minetest.global_exists("techage") then
 						M(pos):set_string("connected_to", number)
 						M(info.pos):set_string("terminal_pos", P2S(pos))
 						term:add_line(pos, nvm, "Connected.")
+						nvm.trm_connected = true
 					else
 						M(pos):set_string("connected_to", "")
 						term:add_line(pos, nvm, "Not connected.")
+						nvm.trm_connected = nil
 					end
 				else
 					term:add_line(pos, nvm, "Protection error!")
 				end
 			end
 		end)
+	term:register_command("@disconnect", 
+		"- Disconnect from a block with '@disconnect'",
+		function(self, pos, nvm, cmnd)
+			M(pos):set_string("connected_to", "")
+			term:add_line(pos, nvm, "Not connected.")
+			nvm.trm_connected = nil
+		end)
 	term:register_command("@send", 
 		"- Send a TA command with '@send <num> <cmd> [<data>]'\n    Example: @send 1234 on",
-		function(self, pos, meta, nvm, cmnd, param)
+		function(self, pos, nvm, cmnd, param)
 			if param then
 				local owner = M(pos):get_string("owner")
 				local num, cmnd, payload = param:match('^([0-9]+)%s+(%w+)%s*(.*)$')
@@ -70,15 +79,15 @@ local function formspec(pos)
 	local nvm = techage.get_nvm(pos)
 	return "formspec_version[4]" ..
 		"size[12.8,10.5]" ..
-		term:fs_size_buttons(pos, nvm, 11.2, 0.1) ..
+		term:fs_size_buttons(pos, nvm, 10.6, 0.1) ..
 		term:fs_window(pos, nvm, 0.4, 0.8) ..
 		term:fs_input_with_function_keys(pos, nvm, 0.4, 8.6)
 end
 
 
-local function command_handler(self, pos, meta, nvm, command, payload, player)
-	print("command_handler", dump(command))
-	if M(pos):contains("connected_to") then
+local function command_handler(self, pos, nvm, command)
+	--print("command_handler", dump(command))
+	if nvm.trm_connected then
 		local number = M(pos):get_string("connected_to")
 		techage.send_single(0, number, "term", command)
 	else
@@ -129,7 +138,7 @@ minetest.register_node("termlib:terminal1", {
 
 	on_receive_fields = function(pos, formname, fields, player)
 		local nvm = techage.get_nvm(pos)
-		term:on_receive_fields(pos, formname, fields, player, nvm)
+		term:on_receive_fields(pos, fields, player, nvm)
 		M(pos):set_string("formspec", formspec(pos))
 	end,
 	
@@ -169,7 +178,6 @@ if minetest.global_exists("techage") then
 
 	techage.lua_ctlr.register_function("get_str", {
 		cmnd = function(self)
-			print("get_str")
 			return techage.lua_ctlr.get_command(self.meta.number)
 		end,
 		help = ' $get_str()  --> text string or nil\n'..
@@ -184,8 +192,10 @@ if minetest.global_exists("techage") then
 			text = tostring(text or "")
 			local pos = S2P(M(self.meta.pos):get_string("terminal_pos"))
 			local nvm = techage.get_nvm(pos)
-			if term:put_string(pos, nvm, text) then
-				M(pos):set_string("formspec", formspec(pos))
+			if nvm.trm_connected then
+				if term:put_string(pos, nvm, text) then
+					M(pos):set_string("formspec", formspec(pos))
+				end
 			end
 		end,
 		help = " $put_str(text)\n"..

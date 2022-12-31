@@ -36,7 +36,7 @@ function Term:new(attr)
 	return o
 end
 
--- handler(self, pos, meta, mem, cmnd, payload, player)
+-- handler(self, pos, mem, cmnd, payload)
 function Term:register_command(command, help_text, handler)
 	self.registered_commands[command] = handler
 	table.insert(self.help_text, help_text)
@@ -70,7 +70,8 @@ end
 function Term:new_line(pos, mem)
 	mem.trm_cursor_row = mem.trm_cursor_row or 1
 	if mem.trm_cursor_row == 0 then
-		--
+		termlib.command_handler(self, pos, mem, mem.trm_lines[0])
+		mem.trm_lines[0] = ""
 	elseif mem.trm_cursor_row < self.size_y then
 		mem.trm_cursor_row = mem.trm_cursor_row + 1
 	else
@@ -252,10 +253,11 @@ function Term:fs_size_buttons(pos, mem, x, y)
 	return "container[" .. x .. "," .. y .. "]" ..
 		"button[0.0,0;0.6,0.6;larger;+]" ..
 		"button[0.6,0;0.6,0.6;smaller;-]" ..
+		"button[1.2,0;0.6,0.6;help;?]" ..
 		"container_end[]"
 end
 
-function Term:on_receive_fields(pos, formname, fields, player, mem)
+function Term:on_receive_fields(pos, fields, player, mem)
 	local meta = minetest.get_meta(pos)
 	local public = meta:get_int("public")
 	if public == 2 or 
@@ -271,7 +273,7 @@ function Term:on_receive_fields(pos, formname, fields, player, mem)
 			mem.editing = nil
 		end
 		if fields.key_enter_field or fields.enter then
-			local cmnd = termlib.command_handler(self, pos, meta, mem, fields.command, player)
+			local cmnd = termlib.command_handler(self, pos, mem, fields.command)
 			if cmnd then
 				if self.history_enabled then
 					termlib.historybuffer_add(mem, cmnd)
@@ -288,44 +290,22 @@ function Term:on_receive_fields(pos, formname, fields, player, mem)
 				mem.trm_command = termlib.historybuffer_next(mem)
 				mem.editing = true
 			end
+		elseif fields.help then
+			self:clear_lines(pos, mem)
+			self:put_string(pos, mem, table.concat(self.help_text, "\n"))
 		elseif fields.larger then
 			mem.trm_text_size = math.min((mem.trm_text_size or 0) + 1, 8)
 		elseif fields.smaller then
 			mem.trm_text_size = math.max((mem.trm_text_size or 0) - 1, -8)
 		elseif fields.quit == "true" then
 			mem.trm_ttl = 0
-		elseif fields.bttn1 then 
-			local cmnd = meta:get_string("bttn_cmnd1")
-			self:add_line(pos, mem, "$ " .. cmnd)
-			termlib.command_handler(self, pos, meta, mem, cmnd, player)
-		elseif fields.bttn2 then
-			local cmnd = meta:get_string("bttn_cmnd2")
-			self:add_line(pos, mem, "$ " .. cmnd)
-			termlib.command_handler(self, pos, meta, mem, cmnd, player)
-		elseif fields.bttn3 then
-			local cmnd = meta:get_string("bttn_cmnd3")
-			self:add_line(pos, mem, "$ " .. cmnd)
-			termlib.command_handler(self, pos, meta, mem, cmnd, player)
-		elseif fields.bttn4 then
-			local cmnd = meta:get_string("bttn_cmnd4")
-			self:add_line(pos, mem, "$ " .. cmnd)
-			termlib.command_handler(self, pos, meta, mem, cmnd, player)
-		elseif fields.bttn5 then
-			local cmnd = meta:get_string("bttn_cmnd5")
-			self:add_line(pos, mem, "$ " .. cmnd)
-			termlib.command_handler(self, pos, meta, mem, cmnd, player)
-		elseif fields.bttn6 then 
-			local cmnd = meta:get_string("bttn_cmnd6")
-			self:add_line(pos, mem, "$ " .. cmnd)
-			termlib.command_handler(self, pos, meta, mem, cmnd, player)
-		elseif fields.bttn7 then
-			local cmnd = meta:get_string("bttn_cmnd7")
-			self:add_line(pos, mem, "$ " .. cmnd)
-			termlib.command_handler(self, pos, meta, mem, cmnd, player)
-		elseif fields.bttn8 then
-			local cmnd = meta:get_string("bttn_cmnd8")
-			self:add_line(pos, mem, "$ " .. cmnd)
-			termlib.command_handler(self, pos, meta, mem, cmnd, player)
+		else
+			for i = 1, 8 do
+				if fields["bttn" .. i] then
+					local cmnd = meta:get_string("bttn_cmnd" .. i)
+					termlib.command_handler(self, pos, mem, cmnd)
+				end
+			end
 		end
 	end
 end
