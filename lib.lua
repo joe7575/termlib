@@ -90,6 +90,31 @@ function termlib.command_handler(self, pos, mem, command)
 	end
 end
 
+--------------------------------------------------------------------------------
+-- Memory Management (Storage)
+--------------------------------------------------------------------------------
+local storage = minetest.get_mod_storage()
+
+local Data = minetest.deserialize(storage:get_string("Data")) or {}
+
+minetest.register_on_shutdown(function()
+	storage:set_string("Data", minetest.serialize(Data))
+end)
+
+function termlib.get_mem(pos)
+	local hash = minetest.hash_node_position(pos)
+	Data[hash] = Data[hash] or {}
+	return Data[hash]
+end
+
+function termlib.del_mem(pos)
+	local hash = minetest.hash_node_position(pos)
+	Data[hash] = nil
+end
+
+--------------------------------------------------------------------------------
+-- History Buffer
+--------------------------------------------------------------------------------
 function termlib.historybuffer_add(mem, s)
 	mem.trm_lHisbuf = mem.trm_lHisbuf or {}
 	mem.trm_tHisbuf = mem.trm_tHisbuf or {}

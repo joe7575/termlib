@@ -22,4 +22,6 @@ dofile(MP .. "/lib.lua")  -- Helper functions
 dofile(MP .. "/api.lua")  -- Interface functions
 dofile(MP .. "/commands.lua")  -- Internal commands
 dofile(MP .. "/terminal.lua")  -- Example implementation
-
+if minetest.global_exists("techage") then
+	dofile(MP .. "/techage.lua")  -- techage adaption
+end
