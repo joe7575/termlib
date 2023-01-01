@@ -59,6 +59,54 @@ end
 ```
 
 
+### Beduino Controller Example
+
+The same code for the Beduino controller.
+Note that the escape sequences are in octal notation!
+
+```c
+import "stdio.asm"
+import "os.c"
+
+var cnt = 0;
+
+func init() {
+  setstdout(2);  // use external terminal for stdout
+  putstr("\b");  // clear screen
+  putstr("+----------------------------------------------------------+\n");
+  putstr("|                Termlib Terminal Demo                     |\n");
+  putstr("+----------------------------------------------------------+\n");
+
+  putstr("\nThe screen size is 60 characters x 20 lines.\n");
+  putstr("The input field has a history buffer.\n");
+  putstr("The function keys can be labeled and programmed.\n");
+
+  putstr("\033\002\024This is line 20!");
+}
+
+func loop() {
+  var c;
+
+  putstr("\033\002\014");
+  putstr("\tThe counter is ");
+  putnum(cnt);
+  putchar('\n');
+
+  cnt = cnt + 1;
+
+  c = getchar();
+  while(c > 0) {
+    if(c > 127) {
+      putstr("Num: ");
+      putnum(c);
+    } else {
+      putchar(c);
+    }
+  }
+  sleep(10);
+}
+```
+
 ### License
 
 Copyright (C) 2022-2023 Joachim Stolberg

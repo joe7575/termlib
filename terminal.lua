@@ -30,7 +30,7 @@ function termlib.formspec(pos)
 end
 
 minetest.register_node("termlib:terminal1", {
-	description = "Termlib Terminal",
+	description = "Termlib Terminal\n(left-click to preconnect to CPU)",
 	tiles = {
 		-- up, down, right, left, back, front
 		'termlib_terminal1_top.png',
@@ -58,13 +58,32 @@ minetest.register_node("termlib:terminal1", {
 		},
 	},
 
-	after_place_node = function(pos, placer)
+	after_place_node = function(pos, placer, itemstack)
 		local mem = termlib.get_mem(pos)
 		local meta = M(pos)
 		term:init_block(pos, mem)
+		termlib.preserve_cpu_pos(pos, itemstack)
 		meta:set_string("formspec", termlib.formspec(pos))
 		meta:set_string("owner", placer:get_player_name())
 		meta:set_string("infotext", "Termlib Terminal")
+	end,
+
+	on_use = function(itemstack, user, pointed_thing)
+		if pointed_thing.type == "node" then
+			local name = user and user:get_player_name()
+			local cpu_pos = pointed_thing.under
+			if not user or minetest.is_protected(cpu_pos, user:get_player_name()) then
+				minetest.chat_send_player(name, "[termlib] Position protected!")
+				return
+			end
+			termlib.set_cpu_pos(itemstack, cpu_pos)
+
+			local node = minetest.get_node(cpu_pos)
+			local ndef = minetest.registered_nodes[node.name] or {}
+			local desc = ndef.description or "unknown"
+			minetest.chat_send_player(name, "[termlib] Preconnected to " .. desc)
+		end
+		return itemstack
 	end,
 
 	on_receive_fields = function(pos, formname, fields, player)

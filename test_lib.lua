@@ -7,7 +7,7 @@
 	GPL v3
 	See LICENSE.txt for more information
 
-	Library for text terminal implementations
+	Test the library functions
 ]]--
 
 local MP = '/home/joachim/Projekte/lua/minetest_unittest/lib'

@@ -77,19 +77,6 @@ function termlib.func_key_bttns(pos, mem, x, y)
 		"container_end[]"
 end
 
-function termlib.command_handler(self, pos, mem, command)
-	command = string.sub(command or "", 1, self.size_x)
-	command = string.trim(command)
-	local cmnd, payload = command:match('^([%w_@]+)%s*(.*)$')
-	if self.registered_commands[cmnd] then
-		self:add_line(pos, mem, "$ " .. command)
-		self.registered_commands[cmnd](self, pos, mem, cmnd, payload)
-		return command
-	else
-		self.external_commands(self, pos, mem, command)
-	end
-end
-
 --------------------------------------------------------------------------------
 -- Memory Management (Storage)
 --------------------------------------------------------------------------------
@@ -110,6 +97,42 @@ end
 function termlib.del_mem(pos)
 	local hash = minetest.hash_node_position(pos)
 	Data[hash] = nil
+end
+
+--------------------------------------------------------------------------------
+-- Terminal & CPU positioning 
+--------------------------------------------------------------------------------
+local PosCache = {}
+
+function termlib.set_terminal_pos(cpu_pos, term_pos)
+	M(cpu_pos):set_string("trm_term_pos", P2S(term_pos))
+end
+
+function termlib.set_cpu_pos(itemstack, cpu_pos)
+	itemstack:get_meta():set_string("trm_cpu_pos", P2S(cpu_pos))
+end
+
+function termlib.get_terminal_pos(cpu_pos)
+	local hash = minetest.hash_node_position(cpu_pos)
+	if not PosCache[hash] then
+		PosCache[hash] = S2P(M(cpu_pos):get_string("trm_term_pos"))
+	end
+	return PosCache[hash]
+end
+
+function termlib.get_cpu_pos(term_pos)
+	local hash = minetest.hash_node_position(term_pos)
+	if not PosCache[hash] then
+		PosCache[hash] = S2P(M(term_pos):get_string("trm_cpu_pos"))
+	end
+	return PosCache[hash]
+end
+
+function termlib.preserve_cpu_pos(pos, itemstack)
+	local imeta = itemstack:get_meta()
+	if imeta then
+		M(pos):set_string("trm_cpu_pos", imeta:get_string("trm_cpu_pos"))
+	end
 end
 
 --------------------------------------------------------------------------------

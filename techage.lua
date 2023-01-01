@@ -7,44 +7,27 @@
 	GPL v3
 	See LICENSE.txt for more information
 
-	Library for text terminal implementations
+	Backend for the TechAge Lua Controller
 ]]--
 
 local M = minetest.get_meta
-local P2S = function(pos) if pos then return minetest.pos_to_string(pos) end end
-local S2P = minetest.string_to_pos
 local term = termlib.term
 
-term:register_command("@connect", 
-	"- Connect to a CPU/machine with '@connect <number>'",
-	function(self, pos, mem, cmnd, number)
-		if number then
-			local owner = M(pos):get_string("owner")
-			if techage.not_protected(number, owner, owner) then
-				local info = techage.get_node_info(number)
-				if info and info.name == "techage:ta4_lua_controller" then
-					M(pos):set_string("connected_to", number)
-					M(info.pos):set_string("terminal_pos", P2S(pos))
-					term:add_line(pos, mem, "Connected.")
-					mem.trm_connected = true
-				else
-					M(pos):set_string("connected_to", "")
-					term:add_line(pos, mem, "Not connected.")
-					mem.trm_connected = nil
-				end
-			else
-				term:add_line(pos, mem, "Protection error!")
-			end
-		end
-	end)
+local orig_send_to_cpu = term.send_to_cpu
 
-term:register_command("@disconnect", 
-	"- Disconnect from a block with '@disconnect'",
-	function(self, pos, mem, cmnd)
-		M(pos):set_string("connected_to", "")
-		term:add_line(pos, mem, "Not connected.")
-		mem.trm_connected = nil
-	end)
+term.send_to_cpu = function(self,pos, mem, cpu_pos, node, command)
+	if node.name == "techage:ta4_lua_controller" then
+		local number = techage.get_node_number(cpu_pos)
+		if number then
+			return techage.send_single(0, number, "term", command)
+		else
+			term:add_line(pos, mem, "Target block has no techage number")
+			return false
+		end
+	else
+		return orig_send_to_cpu(self, pos, mem, cpu_pos, node, command)
+	end
+end
 
 term:register_command("@send", 
 	"- Send a TA command with '@send <num> <cmd> [<data>]'\n    Example: @send 1234 on",
@@ -69,19 +52,6 @@ term:register_command("@send",
 		end
 	end)
 
-local function command_handler(self, pos, mem, command)
-	--print("command_handler", dump(command))
-	if mem.trm_connected then
-		local number = M(pos):get_string("connected_to")
-		techage.send_single(0, number, "term", command)
-	else
-		term:add_line(pos, mem, "$ " .. command)
-	end
-end
-
--- Post register the command handler
-term.external_commands = command_handler
-
 techage.lua_ctlr.register_function("get_str", {
 	cmnd = function(self)
 		return techage.lua_ctlr.get_command(self.meta.number)
@@ -96,11 +66,11 @@ techage.lua_ctlr.register_function("get_str", {
 techage.lua_ctlr.register_action("put_str", {
 	cmnd = function(self, text)
 		text = tostring(text or "")
-		local pos = S2P(M(self.meta.pos):get_string("terminal_pos"))
-		local mem = termlib.get_mem(pos)
+		local term_pos = termlib.get_terminal_pos(self.meta.pos)
+		local mem = termlib.get_mem(term_pos)
 		if mem.trm_connected then
-			if term:put_string(pos, mem, text) then
-				M(pos):set_string("formspec", termlib.formspec(pos))
+			if term:put_string(term_pos, mem, text) then
+				M(term_pos):set_string("formspec", termlib.formspec(term_pos))
 			end
 		end
 	end,

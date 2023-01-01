@@ -42,6 +42,17 @@ function Term:register_command(command, help_text, handler)
 	table.insert(self.help_text, help_text)
 end
 
+-- To be overwritten by real backend handlers, based on 'node.name'
+-- self: Term instance
+-- pos: terminal pos
+-- mem: terminal block memory
+-- cpu_pos: target pos
+-- node: target node
+-- str: string to be sent
+function Term.send_to_cpu(self, pos, mem, cpu_pos, node, str)
+	return false
+end
+
 function Term:init_block(pos, mem)
 	mem.trm_lines = {}
 	mem.trm_cursor_row = 1
@@ -70,7 +81,7 @@ end
 function Term:new_line(pos, mem)
 	mem.trm_cursor_row = mem.trm_cursor_row or 1
 	if mem.trm_cursor_row == 0 then
-		termlib.command_handler(self, pos, mem, mem.trm_lines[0])
+		self:command_handler(pos, mem, mem.trm_lines[0])
 		mem.trm_lines[0] = ""
 	elseif mem.trm_cursor_row < self.size_y then
 		mem.trm_cursor_row = mem.trm_cursor_row + 1
@@ -171,7 +182,9 @@ function Term:put_char(pos, mem, val)
 	else
 		mem.trm_cursor_row = mem.trm_cursor_row or 1
 		mem.trm_lines = mem.trm_lines or {}
-		mem.trm_lines[mem.trm_cursor_row] = mem.trm_lines[mem.trm_cursor_row] .. string.char(val)
+		if mem.trm_lines[mem.trm_cursor_row]:len() < self.size_x then
+			mem.trm_lines[mem.trm_cursor_row] = mem.trm_lines[mem.trm_cursor_row] .. string.char(val)
+		end
 		return false
 	end
 end
@@ -257,6 +270,28 @@ function Term:fs_size_buttons(pos, mem, x, y)
 		"container_end[]"
 end
 
+function Term:command_handler(pos, mem, command)
+	command = string.sub(command or "", 1, self.size_x)
+	command = string.trim(command)
+	local cmnd, payload = command:match('^([%w_@]+)%s*(.*)$')
+	if self.registered_commands[cmnd] then
+		self:add_line(pos, mem, "$ " .. command)
+		self.registered_commands[cmnd](self, pos, mem, cmnd, payload)
+		return command
+	else
+		if not mem.trm_connected then
+			self:add_line(pos, mem, "$ " .. command)
+		end
+		local cpu_pos = termlib.get_cpu_pos(pos)
+		if cpu_pos then
+			local node = minetest.get_node(cpu_pos)
+			if self.send_to_cpu(self, pos, mem, cpu_pos, node, command) == false then
+				self:add_line(pos, mem, "Something went wrong...")
+			end
+		end
+	end
+end
+
 function Term:on_receive_fields(pos, fields, player, mem)
 	local meta = minetest.get_meta(pos)
 	local public = meta:get_int("public")
@@ -273,7 +308,7 @@ function Term:on_receive_fields(pos, fields, player, mem)
 			mem.editing = nil
 		end
 		if fields.key_enter_field or fields.enter then
-			local cmnd = termlib.command_handler(self, pos, mem, fields.command)
+			local cmnd = self:command_handler(pos, mem, fields.command)
 			if cmnd then
 				if self.history_enabled then
 					termlib.historybuffer_add(mem, cmnd)
@@ -303,7 +338,7 @@ function Term:on_receive_fields(pos, fields, player, mem)
 			for i = 1, 8 do
 				if fields["bttn" .. i] then
 					local cmnd = meta:get_string("bttn_cmnd" .. i)
-					termlib.command_handler(self, pos, mem, cmnd)
+					self:command_handler(pos, mem, cmnd)
 				end
 			end
 		end

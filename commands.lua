@@ -7,15 +7,13 @@
 	GPL v3
 	See LICENSE.txt for more information
 
-	Library for text terminal implementations
+	Local/internal terminal commands
 ]]--
 
 -- for lazy programmers
 local M = minetest.get_meta
-local P2S = function(pos) if pos then return minetest.pos_to_string(pos) end end
-local S2P = minetest.string_to_pos
 
-local HELP = [[              *** Escape Sequences ***
+local HELP = [[Escape Sequences:
 
  Chars            | Description
 ------------------+-------------------------------------
@@ -63,6 +61,25 @@ function termlib.register_internal_commands(self)
 			else
 				self:add_line(pos, mem, "Invalid syntax!")
 			end
+		end)
+	self:register_command("@connect", 
+		"- Connect to the CPU/machine/block with '@connect'",
+		function(self, pos, mem, cmnd)
+			local cpu_pos = termlib.get_cpu_pos(pos)
+			if cpu_pos then
+				termlib.set_terminal_pos(cpu_pos, pos)
+				self:add_line(pos, mem, "Connected.")
+				mem.trm_connected = true
+			else
+				self:add_line(pos, mem, "No valid CPU/machine/block position.")
+				mem.trm_connected = nil
+			end
+		end)
+	self:register_command("@disconnect", 
+		"- Disconnect from the CPU/machine/block with '@disconnect'",
+		function(self, pos, mem, cmnd)
+			self:add_line(pos, mem, "Disconnected.")
+			mem.trm_connected = nil
 		end)
 	self:register_command("@help", 
 		"- Output further help with '@help'",
