@@ -28,30 +28,30 @@ local HELP = [[Escape Sequences:
 ]]
 
 function termlib.register_internal_commands(self)
-	self:register_command("@cls", 
+	self:register_command("@cls",
 		"- Clear screen with '@cls'",
 		function(self, pos, mem, cmnd)
 			self:clear_lines(pos, mem)
 		end)
-	self:register_command("@publ", 
+	self:register_command("@publ",
 		"- Switch to public mode with '@publ'",
 		function(self, pos, mem, cmnd)
 			M(pos):set_int("public", 2)
 			self:add_line(pos, mem, "Switched to public mode!")
 		end)
-	self:register_command("@prot", 
+	self:register_command("@prot",
 		"- Switch to protected mode with '@prot'",
 		function(self, pos, mem, cmnd)
 			M(pos):set_int("public", 1)
 			self:add_line(pos, mem, "Switched to protected mode!")
 		end)
-	self:register_command("@priv", 
+	self:register_command("@priv",
 		"- Switch to private mode with '@priv'",
 		function(self, pos, mem, cmnd)
 			M(pos):set_int("public", 0)
 			self:add_line(pos, mem, "Switched to private mode!")
 		end)
-	self:register_command("@set", 
+	self:register_command("@set",
 		"- Program a function button with\n  '@set <button> <new-button-text> <command>'\n    Example: @set F1 CLS @cls",
 		function(self, pos, mem, cmnd, payload)
 			local bttn_num, label, cmd = payload:match('^F([1-8])%s+([%w_]+)%s+(.+)$')
@@ -62,7 +62,7 @@ function termlib.register_internal_commands(self)
 				self:add_line(pos, mem, "Invalid syntax!")
 			end
 		end)
-	self:register_command("@connect", 
+	self:register_command("@connect",
 		"- Connect to the CPU/machine/block with '@connect'",
 		function(self, pos, mem, cmnd)
 			local cpu_pos = termlib.get_cpu_pos(pos)
@@ -75,13 +75,13 @@ function termlib.register_internal_commands(self)
 				mem.trm_connected = nil
 			end
 		end)
-	self:register_command("@disconnect", 
+	self:register_command("@disconnect",
 		"- Disconnect from the CPU/machine/block with '@disconnect'",
 		function(self, pos, mem, cmnd)
 			self:add_line(pos, mem, "Disconnected.")
 			mem.trm_connected = nil
 		end)
-	self:register_command("@help", 
+	self:register_command("@help",
 		"- Output further help with '@help'\n  see also': https://github.com/joe7575/termlib",
 		function(self, pos, mem, cmnd)
 			self:clear_lines(pos, mem)

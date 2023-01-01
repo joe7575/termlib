@@ -29,7 +29,7 @@ term.send_to_cpu = function(self,pos, mem, cpu_pos, node, command)
 	end
 end
 
-term:register_command("@send", 
+term:register_command("@send",
 	"- Send a TA command with '@send <num> <cmd> [<data>]'\n    Example: @send 1234 on",
 	function(self, pos, mem, cmnd, param)
 		if param then

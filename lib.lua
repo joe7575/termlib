@@ -100,7 +100,7 @@ function termlib.del_mem(pos)
 end
 
 --------------------------------------------------------------------------------
--- Terminal & CPU positioning 
+-- Terminal & CPU positioning
 --------------------------------------------------------------------------------
 local PosCache = {}
 
@@ -141,7 +141,7 @@ end
 function termlib.historybuffer_add(mem, s)
 	mem.trm_lHisbuf = mem.trm_lHisbuf or {}
 	mem.trm_tHisbuf = mem.trm_tHisbuf or {}
-	
+
 	if #s > 2 then
 		if not mem.trm_tHisbuf[s] then
 			table.insert(mem.trm_lHisbuf, s)
@@ -160,7 +160,7 @@ end
 function termlib.historybuffer_priv(mem)
 	mem.trm_lHisbuf = mem.trm_lHisbuf or {}
 	mem.trm_lHisbuf_idx = mem.trm_lHisbuf_idx or 1
-	
+
 	mem.trm_lHisbuf_idx = math.max(1, mem.trm_lHisbuf_idx - 1)
 	return mem.trm_lHisbuf[mem.trm_lHisbuf_idx]
 end
@@ -168,7 +168,7 @@ end
 function termlib.historybuffer_next(mem)
 	mem.trm_lHisbuf = mem.trm_lHisbuf or {}
 	mem.trm_lHisbuf_idx = mem.trm_lHisbuf_idx or 1
-	
+
 	mem.trm_lHisbuf_idx = math.min(#mem.trm_lHisbuf, mem.trm_lHisbuf_idx + 1)
 	return mem.trm_lHisbuf[mem.trm_lHisbuf_idx]
 end

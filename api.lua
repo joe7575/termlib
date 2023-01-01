@@ -11,7 +11,7 @@
 ]]--
 
 termlib.Term = {}
-local Term = termlib.Term 
+local Term = termlib.Term
 local M = minetest.get_meta
 local S = termlib.S
 
@@ -208,7 +208,7 @@ function Term:write_line(pos, mem, row, s)
 end
 
 function Term:add_line(pos, mem, s)
-	mem.trm_lines = mem.trm_lines or {} 
+	mem.trm_lines = mem.trm_lines or {}
 	self:new_line(pos, mem)
 	mem.trm_lines[mem.trm_cursor_row] = ""
 	return self:put_string(pos, mem, s)
@@ -295,7 +295,7 @@ end
 function Term:on_receive_fields(pos, fields, player, mem)
 	local meta = minetest.get_meta(pos)
 	local public = meta:get_int("public")
-	if public == 2 or 
+	if public == 2 or
 		public == 1 and not minetest.is_protected(pos, player:get_player_name()) or
 		public == 0 and player:get_player_name() == meta:get_string("owner") then
 

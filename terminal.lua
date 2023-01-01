@@ -91,13 +91,13 @@ minetest.register_node("termlib:terminal1", {
 		term:on_receive_fields(pos, fields, player, mem)
 		M(pos):set_string("formspec", termlib.formspec(pos))
 	end,
-	
+
 	on_rightclick = function(pos, node, clicker)
 		local mem = termlib.get_mem(pos)
 		term:trigger_ttl(pos, mem)
 		M(pos):set_string("formspec", termlib.formspec(pos))
 	end,
-	
+
 	after_dig_node = function(pos, oldnode, oldmetadata)
 		termlib.del_mem(pos)
 	end,
