@@ -28,6 +28,6 @@ end
 if minetest.global_exists("sl_controller") then
 	dofile(MP .. "/techpack.lua")  -- TechPack backend
 end
-if minetest.global_exists("beduino") then
+if minetest.global_exists("beduino") and beduino.version >= 0.7 then
 	dofile(MP .. "/beduino.lua")  -- Beduino backend
 end

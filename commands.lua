@@ -82,7 +82,7 @@ function termlib.register_internal_commands(self)
 			mem.trm_connected = nil
 		end)
 	self:register_command("@help", 
-		"- Output further help with '@help'",
+		"- Output further help with '@help'\n  see also': https://github.com/joe7575/termlib",
 		function(self, pos, mem, cmnd)
 			self:clear_lines(pos, mem)
 			self:put_string(pos, mem, HELP)

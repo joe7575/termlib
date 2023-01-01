@@ -17,9 +17,51 @@ Beduino Controllers.
 - Command history buffer
 - Escape sequences for clear screen, goto line, ...
 
+### Instructions
+
+- Preconnect the terminal with the target controller. Therefore, left-click on the target controller with the wielded terminal.
+
+- Place the terminal block and open the terminal menu.
+
+- Click the "Edit" button, enter the command `@connect` and click "Enter". The terminal is now connected to the controller.
+
+- Copy the code from below and start the demo (works for Techage/TechPack Lua controllers and for the Beduino controller).
+
+### Escape and Control Charcters
+
+| Characters (decimal notation) | Description                            |
+| ----------------------------- | -------------------------------------- |
+| \33\1                         | Clear screen                           |
+| \33\2\<row>                   | Set cursor to row \<row> (1 - 20)      |
+| \33\3\<font>                  | 0 = normal, 1 = mono                   |
+| \n                            | New line + carriage return             |
+| \t                            | Tab (up to 8 chars)                    |
+| \r                            | Carriage return (to rewrite line)      |
+| \a                            | Bell (sound)                           |
+| \b                            | Clear screen                           |
+| 128                           | Control character for the buttonm "F1" |
+| 129                           | Control character for the buttonm "F2" |
+| 130                           | Control character for the buttonm "F3" |
+| 131                           | Control character for the buttonm "F4" |
+| 132                           | Control character for the buttonm "F5" |
+| 133                           | Control character for the buttonm "F6" |
+| 134                           | Control character for the buttonm "F7" |
+| 135                           | Control character for the buttonm "F8" |
+
+### Hints
+
+- The terminal font size can be changed with the "+" and "-" buttons.
+- The "?" button outputs the help text.
+- The screen size is 60 characters x 20 lines.
+- The function keys can be labeled and programmed. See help text.
+- To send a string/characters to the controller, enter the string into the edit field and press "Enter".
+- The "ESC" button cancels the editing mode, so that no characters are sent to the controller.
+- The terminal output can be forced with a '\n' or '\r'. The output of a string like "Hello world" is not yet displayed, so output either "Hello world\n" or "\rHello world".
+- The terminal can also be used to connect directly to Techage blocks with command interface.
+
 ### TechAge/TechPack Lua Controller Example
 
-This is the code for the screenshot 2.
+This is the code for the screenshot 2 example.
 
 - `$put_str(s)` is used to output text
 - `$get_str()` is used to read/input text
@@ -124,5 +166,6 @@ Optional: techage, techpack (sl_conttroller), beduino
 
 ### History
 
-- 2022-12-31  V1.01  * Add support for TechPack sl_controller
+- 2023-01-01  V1.02  * Add support for Beduino controllers
+- 2022-12-31  V1.01  * Add support for TechPack sl_controllers
 - 2022-12-26  V1.00  * First version
