@@ -44,10 +44,12 @@ sl_controller.register_action("put_str", {
 	cmnd = function(self, text)
 		text = tostring(text or "")
 		local term_pos = termlib.get_terminal_pos(self.meta.pos)
-		local mem = termlib.get_mem(term_pos)
-		if mem.trm_connected then
-			if term:put_string(term_pos, mem, text) then
-				M(term_pos):set_string("formspec", termlib.formspec(term_pos))
+		if term_pos then
+			local mem = termlib.get_mem(term_pos)
+			if mem.trm_connected then
+				if term:put_string(term_pos, mem, text) then
+					M(term_pos):set_string("formspec", termlib.formspec(term_pos))
+				end
 			end
 		end
 	end,
