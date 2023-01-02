@@ -81,8 +81,10 @@ end
 function Term:new_line(pos, mem)
 	mem.trm_cursor_row = mem.trm_cursor_row or 1
 	if mem.trm_cursor_row == 0 then
-		self:command_handler(pos, mem, mem.trm_lines[0])
+		local cmd = mem.trm_lines[0]
 		mem.trm_lines[0] = ""
+		mem.trm_cursor_row = 1
+		self:command_handler(pos, mem, cmd)
 	elseif mem.trm_cursor_row < self.size_y then
 		mem.trm_cursor_row = mem.trm_cursor_row + 1
 	else
@@ -135,6 +137,10 @@ function Term:escape_sequence(pos, mem, val)
 			self:clear_lines(pos, mem)
 			mem.trm_escaped = false
 			return true
+		elseif val == 4 then
+			mem.trm_cursor_row = 0
+			mem.trm_lines[0] = ""
+			mem.trm_escaped = false
 		else
 			mem.trm_esc_cmnd = val
 			return false

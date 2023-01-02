@@ -61,14 +61,3 @@ end
 beduino.lib.register_SystemHandler(2, function(cpu_pos, address, regA, regB, regC)
 	return getchar(cpu_pos)
 end)
-
-
-minetest.register_craft({
-	output = "termlib:terminal1",
-	recipe = {
-		{"", "techage:ta4_terminal", ""},
-		{"", "techage:ta4_ramchip", ""},
-		{"", "", ""},
-	},
-})
-

@@ -17,9 +17,10 @@ local HELP = [[Escape Sequences:
 
  Chars            | Description
 ------------------+-------------------------------------
- \33\1            | Clear screen
- \33\2\<row>      | Set cursor to row <row> (1 - 20)
- \33\3\<font>     | 0 = normal, 1 = mono
+ \27\1            | Clear screen
+ \27\2\<row>      | Set cursor to row <row> (1 - 20)
+ \27\3\<font>     | 0 = normal, 1 = mono
+ \27\4\<cmnd>\n   | Execute the command
  \n               | New line + Carriage Return
  \t               | Tab (8 chars)
  \r               | Carriage Return (rewrite line)

@@ -2,7 +2,7 @@
 
 **A Library for Minetest text terminals**
 
-This mod comes with a example terminal to be used with TechAge, TechPack, or
+This mod comes with a example terminal to be used with TechAge, TechPack, and
 Beduino Controllers.
 
 ![screenshot_1](./screenshot_1.png)
@@ -12,9 +12,9 @@ Beduino Controllers.
 
 ### Features
 
-- Screen memory handling, configurable size
-- Programmable function keys (F1 - F8)
-- Command history buffer
+- Screen memory handling, configurable size.
+- Programmable function keys (F1 - F8). Example: `@set F1 CLS @cls`
+- Command history buffer.
 - Escape sequences for clear screen, goto line, ...
 
 ### Instructions
@@ -29,24 +29,27 @@ Beduino Controllers.
 
 ### Escape and Control Charcters
 
-| Characters (decimal notation) | Description                            |
-| ----------------------------- | -------------------------------------- |
-| \33\1                         | Clear screen                           |
-| \33\2\<row>                   | Set cursor to row \<row> (1 - 20)      |
-| \33\3\<font>                  | 0 = normal, 1 = mono                   |
-| \n                            | New line + carriage return             |
-| \t                            | Tab (up to 8 chars)                    |
-| \r                            | Carriage return (to rewrite line)      |
-| \a                            | Bell (sound)                           |
-| \b                            | Clear screen                           |
-| 128                           | Control character for the buttonm "F1" |
-| 129                           | Control character for the buttonm "F2" |
-| 130                           | Control character for the buttonm "F3" |
-| 131                           | Control character for the buttonm "F4" |
-| 132                           | Control character for the buttonm "F5" |
-| 133                           | Control character for the buttonm "F6" |
-| 134                           | Control character for the buttonm "F7" |
-| 135                           | Control character for the buttonm "F8" |
+| Characters (decimal notation) | Description                                                  |
+| ----------------------------- | ------------------------------------------------------------ |
+| \27\1                         | Clear screen                                                 |
+| \27\2\<row>                   | Set cursor to row \<row> (1 - 20)                            |
+| \27\3\<font>                  | 0 = normal, 1 = mono                                         |
+| \27\4\<command>\n             | Execute the command.<br />Example: "\27\4@set F1 CLS @cls\n" |
+| \n                            | New line + carriage return                                   |
+| \t                            | Tab (up to 8 chars)                                          |
+| \r                            | Carriage return (to rewrite line)                            |
+| \a                            | Bell (sound)                                                 |
+| \b                            | Clear screen                                                 |
+| 128                           | Control character for the buttonm "F1"                       |
+| 129                           | Control character for the buttonm "F2"                       |
+| 130                           | Control character for the buttonm "F3"                       |
+| 131                           | Control character for the buttonm "F4"                       |
+| 132                           | Control character for the buttonm "F5"                       |
+| 133                           | Control character for the buttonm "F6"                       |
+| 134                           | Control character for the buttonm "F7"                       |
+| 135                           | Control character for the buttonm "F8"                       |
+
+### 
 
 ### Hints
 
@@ -58,6 +61,7 @@ Beduino Controllers.
 - The "ESC" button cancels the editing mode, so that no characters are sent to the controller.
 - The terminal output can be forced with a '\n' or '\r'. The output of a string like "Hello world" is not yet displayed, so output either "Hello world\n" or "\rHello world".
 - The terminal can also be used to connect directly to Techage blocks with command interface.
+- Using the escape sequence `\27\4\<command>\n`, the given command is executed like commands entered in the terminal. This makes it possible, for example, to program the function keys.
 
 ### TechAge/TechPack Lua Controller Example
 
