@@ -32,7 +32,7 @@ Beduino Controllers.
 
 ### Escape and Control Charcters
 
-| Characters (decimal notation) | Description                                                  |
+| Characters (dec)    | Description                                                  |
 | ------------------- | ------------------------------------------------------------ |
 | `\27\1`             | Clear screen                                                 |
 | `\27\2\<row>`       | Set cursor to given row (1 - 20). E.g.: `\27\2\1` for row 1  |
@@ -45,14 +45,14 @@ Beduino Controllers.
 | `\r`                | Carriage return (to rewrite line)                            |
 | `\a`                | Bell (sound)                                                 |
 | `\b`                | Clear screen                                                 |
-| 128                 | Control character for the button "F1"                       |
-| 129                 | Control character for the button "F2"                       |
-| 130                 | Control character for the button "F3"                       |
-| 131                 | Control character for the button "F4"                       |
-| 132                 | Control character for the button "F5"                       |
-| 133                 | Control character for the button "F6"                       |
-| 134                 | Control character for the button "F7"                       |
-| 135                 | Control character for the button "F8"                       |
+| 128                 | Control character for the button "F1"                        |
+| 129                 | Control character for the button "F2"                        |
+| 130                 | Control character for the button "F3"                        |
+| 131                 | Control character for the button "F4"                        |
+| 132                 | Control character for the button "F5"                        |
+| 133                 | Control character for the button "F6"                        |
+| 134                 | Control character for the button "F7"                        |
+| 135                 | Control character for the button "F8"                        |
 
 ### 
 
