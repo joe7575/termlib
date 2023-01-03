@@ -21,6 +21,8 @@ local HELP = [[Escape Sequences:
  \27\2\<row>      | Set cursor to row <row> (1 - 20)
  \27\3\<font>     | 0 = normal, 1 = mono
  \27\4\<cmnd>\n   | Execute the command
+ \27\5\1          | suppress further terminal output
+ \27\5\2          | force the terminal output
  \n               | New line + Carriage Return
  \t               | Tab (8 chars)
  \r               | Carriage Return (rewrite line)
