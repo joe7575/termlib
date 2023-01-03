@@ -13,7 +13,7 @@
 termlib = {}
 
 -- Version for compatibility checks, see readme.md
-termlib.version = 1.01
+termlib.version = 1.03
 termlib.S = minetest.get_translator("termlib")
 
 local MP = minetest.get_modpath("termlib")

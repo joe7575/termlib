@@ -116,10 +116,10 @@ function Term:ctrl_char(pos, mem, val)
 	elseif val == 10 then  -- new line ('\n')
 		self:new_line(pos, mem)
 		mem.trm_lines[mem.trm_cursor_row] = ""
-		return true
+		return mem.trm_suppressed ~= true
 	elseif val == 13 then  -- carriage return ('\r')
 		mem.trm_lines[mem.trm_cursor_row] = ""
-		return true
+		return false
 	elseif val == 27 then  -- escape
 		mem.trm_escaped = true
 		return false
@@ -151,7 +151,7 @@ function Term:escape_sequence(pos, mem, val)
 			mem.trm_lines[mem.trm_cursor_row] = ""
 			mem.trm_esc_cmnd = nil
 			mem.trm_escaped = nil
-			return true
+			return false
 		elseif mem.trm_esc_cmnd == 3 then
 			if val == 0 then
 				mem.trm_font = "normal"
@@ -161,6 +161,11 @@ function Term:escape_sequence(pos, mem, val)
 			mem.trm_esc_cmnd = nil
 			mem.trm_escaped = nil
 			return false
+		elseif mem.trm_esc_cmnd == 5 then
+			mem.trm_suppressed = (val == 1)
+			mem.trm_esc_cmnd = nil
+			mem.trm_escaped = nil
+			return val == 2
 		else
 			putchar(mem, 27)
 			putchar(mem, mem.trm_esc_cmnd)

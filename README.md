@@ -19,35 +19,40 @@ Beduino Controllers.
 
 ### Instructions
 
-- Preconnect the terminal with the target controller. Therefore, left-click on the target controller with the wielded terminal.
+- Preconnect the terminal with the target controller. Therefore, left-click on the target controller
+  with the wielded terminal.
 
 - Place the terminal block and open the terminal menu.
 
-- Click the "Edit" button, enter the command `@connect` and click "Enter". The terminal is now connected to the controller.
+- Click the "Edit" button, enter the command `@connect` and click "Enter". The terminal is now
+  connected to the controller.
 
-- Copy the code from below and start the demo (works for Techage/TechPack Lua controllers and for the Beduino controller).
+- Copy the code from below and start the demo (works for Techage/TechPack Lua controllers and for
+  the Beduino controller).
 
 ### Escape and Control Charcters
 
 | Characters (decimal notation) | Description                                                  |
-| ----------------------------- | ------------------------------------------------------------ |
-| \27\1                         | Clear screen                                                 |
-| \27\2\<row>                   | Set cursor to row \<row> (1 - 20)                            |
-| \27\3\<font>                  | 0 = normal, 1 = mono                                         |
-| \27\4\<command>\n             | Execute the command.<br />Example: "\27\4@set F1 CLS @cls\n" |
-| \n                            | New line + carriage return                                   |
-| \t                            | Tab (up to 8 chars)                                          |
-| \r                            | Carriage return (to rewrite line)                            |
-| \a                            | Bell (sound)                                                 |
-| \b                            | Clear screen                                                 |
-| 128                           | Control character for the buttonm "F1"                       |
-| 129                           | Control character for the buttonm "F2"                       |
-| 130                           | Control character for the buttonm "F3"                       |
-| 131                           | Control character for the buttonm "F4"                       |
-| 132                           | Control character for the buttonm "F5"                       |
-| 133                           | Control character for the buttonm "F6"                       |
-| 134                           | Control character for the buttonm "F7"                       |
-| 135                           | Control character for the buttonm "F8"                       |
+| ------------------- | ------------------------------------------------------------ |
+| `\27\1`             | Clear screen                                                 |
+| `\27\2\<row>`       | Set cursor to given row (1 - 20). E.g.: `\27\2\1` for row 1  |
+| `\27\3\<font>`      | 0 = normal, 1 = mono                                         |
+| `\27\4<command>\n`  | Execute the command.<br />Example: `\27\4@set F1 CLS @cls\n` |
+| `\27\5\1`           | suppress further terminal output                             |
+| `\27\5\2`           | force the terminal output                                    |
+| `\n`                | New line + carriage return (force terminal output)           |
+| `\t`                | Tab (up to 8 chars)                                          |
+| `\r`                | Carriage return (to rewrite line)                            |
+| `\a`                | Bell (sound)                                                 |
+| `\b`                | Clear screen                                                 |
+| 128                 | Control character for the button "F1"                       |
+| 129                 | Control character for the button "F2"                       |
+| 130                 | Control character for the button "F3"                       |
+| 131                 | Control character for the button "F4"                       |
+| 132                 | Control character for the button "F5"                       |
+| 133                 | Control character for the button "F6"                       |
+| 134                 | Control character for the button "F7"                       |
+| 135                 | Control character for the button "F8"                       |
 
 ### 
 
@@ -56,12 +61,17 @@ Beduino Controllers.
 - The terminal font size can be changed with the "+" and "-" buttons.
 - The "?" button outputs the help text.
 - The screen size is 60 characters x 20 lines.
-- The function keys can be labeled and programmed. See help text.
+- The function keys can be labeled and programmed. See help text
 - To send a string/characters to the controller, enter the string into the edit field and press "Enter".
 - The "ESC" button cancels the editing mode, so that no characters are sent to the controller.
-- The terminal output can be forced with a '\n' or '\r'. The output of a string like "Hello world" is not yet displayed, so output either "Hello world\n" or "\rHello world".
+- The output on the terminal only occurs after a '\n' character. The output of a string like
+  "Hello world" is not yet displayed, so output "Hello world\n".
+- If several lines shall be output as one block, it is advisable to suppress the output at
+  the beginning with `\27\5\1` and to activate it again at the end with `\27\5\2`.
+  This prevents the text on the terminal from flickering.
 - The terminal can also be used to connect directly to Techage blocks with command interface.
-- Using the escape sequence `\27\4\<command>\n`, the given command is executed like commands entered in the terminal. This makes it possible, for example, to program the function keys.
+- Using the escape sequence `\27\4\<command>\n`, the given command is executed like commands
+  entered in the terminal. This makes it possible, for example, to program the function keys.
 
 ### TechAge/TechPack Lua Controller Example
 
@@ -91,7 +101,7 @@ $put_str("\27\2\20This is line 20!")
 
 ```lua
 $put_str("\27\2\12")
-$put_str("\tThe counter is " .. cnt .. "\n")
+$put_str("The counter is " .. cnt .. "\n")
 cnt = cnt + 1
 
 s = $get_str()
@@ -134,7 +144,7 @@ func loop() {
   var c;
 
   putstr("\033\002\014");
-  putstr("\tThe counter is ");
+  putstr("The counter is ");
   putnum(cnt);
   putchar('\n');
 
@@ -164,12 +174,13 @@ Textures: CC BY-SA 3.0
 
 ### Dependencies
 
-Required: none
+Required: none  
 Optional: techage, techpack (sl_conttroller), beduino
 
 
 ### History
 
+- 2023-01-03  V1.03  * Add escape sequences to suppress/force the terminal output
 - 2023-01-01  V1.02  * Add support for Beduino controllers
 - 2022-12-31  V1.01  * Add support for TechPack sl_controllers
 - 2022-12-26  V1.00  * First version
