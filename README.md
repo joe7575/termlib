@@ -121,8 +121,8 @@ The same code for the Beduino controller.
 Note that the escape sequences are in octal notation!
 
 ```c
-import "stdio.asm"
-import "os.c"
+import "sys/stdio.asm"
+import "sys/os.c"
 
 var cnt = 0;
 
