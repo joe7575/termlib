@@ -32,29 +32,28 @@ Beduino Controllers.
 
 ### Escape and Control Charcters
 
-| Characters (dec)    | Description                                                  |
-| ------------------- | ------------------------------------------------------------ |
-| `\27\1`             | Clear screen                                                 |
-| `\27\2\<row>`       | Set cursor to given row (1 - 20). E.g.: `\27\2\1` for row 1  |
-| `\27\3\<font>`      | 0 = normal, 1 = mono                                         |
-| `\27\4<command>\n`  | Execute the command.<br />Example: `\27\4@set F1 CLS @cls\n` |
-| `\27\5\1`           | suppress further terminal output                             |
-| `\27\5\2`           | force the terminal output                                    |
-| `\n`                | New line + carriage return (force terminal output)           |
-| `\t`                | Tab (up to 8 chars)                                          |
-| `\r`                | Carriage return (to rewrite line)                            |
-| `\a`                | Bell (sound)                                                 |
-| `\b`                | Clear screen                                                 |
-| 128                 | Control character for the button "F1"                        |
-| 129                 | Control character for the button "F2"                        |
-| 130                 | Control character for the button "F3"                        |
-| 131                 | Control character for the button "F4"                        |
-| 132                 | Control character for the button "F5"                        |
-| 133                 | Control character for the button "F6"                        |
-| 134                 | Control character for the button "F7"                        |
-| 135                 | Control character for the button "F8"                        |
-
-### 
+| Characters (dec)      | Description                                                  |
+| --------------------- | ------------------------------------------------------------ |
+| `\27\1`               | Clear screen                                                 |
+| `\27\2\<row>`         | Set cursor to given row (1 - 20). E.g.: `\27\2\1` for row 1  |
+| `\27\3\<font>`        | 0 = normal, 1 = mono                                         |
+| `\27\4<command>\n`    | Execute the command.<br />Example: `\27\4@set F1 CLS @cls\n` |
+| `\27\5\1`             | suppress further terminal output                             |
+| `\27\5\2`             | force the terminal output                                    |
+| `\27\6\<x>\<y>text\n` | Insert text on given position `x` (1 - 60) and `y` (1 - 20)  |
+| `\n`                  | New line + carriage return (force terminal output)           |
+| `\t`                  | Tab (up to 8 chars)                                          |
+| `\r`                  | Carriage return (to rewrite line)                            |
+| `\a`                  | Bell (sound)                                                 |
+| `\b`                  | Clear screen                                                 |
+| 128                   | Control character for the button "F1"                        |
+| 129                   | Control character for the button "F2"                        |
+| 130                   | Control character for the button "F3"                        |
+| 131                   | Control character for the button "F4"                        |
+| 132                   | Control character for the button "F5"                        |
+| 133                   | Control character for the button "F6"                        |
+| 134                   | Control character for the button "F7"                        |
+| 135                   | Control character for the button "F8"                        |
 
 ### Hints
 
@@ -66,6 +65,9 @@ Beduino Controllers.
 - The "ESC" button cancels the editing mode, so that no characters are sent to the controller.
 - The output on the terminal only occurs after a '\n' character. The output of a string like
   "Hello world" is not yet displayed, so output "Hello world\n".
+- To insert text on a dedicated terminal position, use the sequence `\27\6\<x>\<y>text\n`.
+  For example, output "Hello world" on x-position 18 (horizontal) and y-position 14 (vertical):
+  `\27\6\18\14Hello world\n`
 - If several lines shall be output as one block, it is advisable to suppress the output at
   the beginning with `\27\5\1` and to activate it again at the end with `\27\5\2`.
   This prevents the text on the terminal from flickering.

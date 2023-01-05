@@ -17,6 +17,12 @@ local S = termlib.S
 
 local SCREENSAVER_TIME = 60 * 5
 
+local function insert_str(text, pos, str)
+	print("insert_str", text, pos, str)
+	return text:sub(1, pos - 1) .. str .. text:sub(pos + str:len(), -1)
+end
+
+
 function Term:new(attr)
 	local o = {
 		size_x = attr.size_x or 60,
@@ -80,15 +86,24 @@ end
 
 function Term:new_line(pos, mem)
 	mem.trm_cursor_row = mem.trm_cursor_row or 1
-	if mem.trm_cursor_row == 0 then
+	if mem.trm_insert_pos then
+		mem.trm_cursor_row = mem.trm_insert_row
+		mem.trm_lines[mem.trm_cursor_row] = 
+			insert_str(mem.trm_lines[mem.trm_cursor_row], mem.trm_insert_pos, mem.trm_lines[0])
+		mem.trm_lines[0] = ""
+		mem.trm_insert_pos = nil
+		mem.trm_insert_row = nil
+	elseif mem.trm_cursor_row == 0 then
 		local cmd = mem.trm_lines[0]
 		mem.trm_lines[0] = ""
 		mem.trm_cursor_row = 1
 		self:command_handler(pos, mem, cmd)
 	elseif mem.trm_cursor_row < self.size_y then
 		mem.trm_cursor_row = mem.trm_cursor_row + 1
+		return true
 	else
 		table.remove(mem.trm_lines, 1)
+		return true
 	end
 end
 
@@ -114,8 +129,9 @@ function Term:ctrl_char(pos, mem, val)
 		end
 		return false
 	elseif val == 10 then  -- new line ('\n')
-		self:new_line(pos, mem)
-		mem.trm_lines[mem.trm_cursor_row] = ""
+		if self:new_line(pos, mem) then
+			mem.trm_lines[mem.trm_cursor_row] = ""
+		end
 		return mem.trm_suppressed ~= true
 	elseif val == 13 then  -- carriage return ('\r')
 		mem.trm_lines[mem.trm_cursor_row] = ""
@@ -145,6 +161,14 @@ function Term:escape_sequence(pos, mem, val)
 			mem.trm_esc_cmnd = val
 			return false
 		end
+	elseif mem.trm_insert_pos then -- part of '\27\6\<pos>\<row>'
+		mem.trm_insert_row = math.min(val, self.size_y)
+		-- Use lines[0] to store the string
+		mem.trm_cursor_row = 0
+		mem.trm_lines[0] = ""
+		mem.trm_esc_cmnd = nil
+		mem.trm_escaped = nil
+		return false
 	else
 		if mem.trm_esc_cmnd == 2 then
 			mem.trm_cursor_row = math.min(val, self.size_y)
@@ -166,6 +190,9 @@ function Term:escape_sequence(pos, mem, val)
 			mem.trm_esc_cmnd = nil
 			mem.trm_escaped = nil
 			return val == 2
+		elseif mem.trm_esc_cmnd == 6 then
+			mem.trm_insert_pos = math.min(val, self.size_x)
+			return false
 		else
 			putchar(mem, 27)
 			putchar(mem, mem.trm_esc_cmnd)
