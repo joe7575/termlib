@@ -135,6 +135,13 @@ function termlib.preserve_cpu_pos(pos, itemstack)
 	end
 end
 
+function termlib.get_node_name(pos)
+	local name = minetest.get_node(pos).name
+	if name then
+		local ndef = minetest.registered_nodes[name]
+		return ndef and ndef.description
+	end
+end
 --------------------------------------------------------------------------------
 -- History Buffer
 --------------------------------------------------------------------------------

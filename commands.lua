@@ -12,6 +12,7 @@
 
 -- for lazy programmers
 local M = minetest.get_meta
+local P2S = function(pos) if pos then return minetest.pos_to_string(pos) end end
 
 local HELP = [[Escape Sequences:
 
@@ -71,7 +72,8 @@ function termlib.register_internal_commands(self)
 			local cpu_pos = termlib.get_cpu_pos(pos)
 			if cpu_pos then
 				termlib.set_terminal_pos(cpu_pos, pos)
-				self:add_line(pos, mem, "Connected.")
+				local name = termlib.get_node_name(cpu_pos) or "oops"
+				self:add_line(pos, mem, string.format("Connected to '%s' at %s.", name, P2S(cpu_pos)))
 				mem.trm_connected = true
 			else
 				self:add_line(pos, mem, "No valid CPU/machine/block position.")

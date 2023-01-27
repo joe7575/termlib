@@ -32,28 +32,33 @@ Beduino Controllers.
 
 ### Escape and Control Charcters
 
-| Characters (dec)      | Description                                                  |
-| --------------------- | ------------------------------------------------------------ |
-| `\27\1`               | Clear screen                                                 |
-| `\27\2\<row>`         | Set cursor to given row (1 - 20). E.g.: `\27\2\1` for row 1  |
-| `\27\3\<font>`        | 0 = normal, 1 = mono                                         |
-| `\27\4<command>\n`    | Execute the command.<br />Example: `\27\4@set F1 CLS @cls\n` |
-| `\27\5\1`             | suppress further terminal output                             |
-| `\27\5\2`             | force the terminal output                                    |
-| `\27\6\<x>\<y>text\n` | Insert text on given position `x` (1 - 60) and `y` (1 - 20)  |
-| `\n`                  | New line + carriage return (force terminal output)           |
-| `\t`                  | Tab (up to 8 chars)                                          |
-| `\r`                  | Carriage return (to rewrite line)                            |
-| `\a`                  | Bell (sound)                                                 |
-| `\b`                  | Clear screen                                                 |
-| 128                   | Control character for the button "F1"                        |
-| 129                   | Control character for the button "F2"                        |
-| 130                   | Control character for the button "F3"                        |
-| 131                   | Control character for the button "F4"                        |
-| 132                   | Control character for the button "F5"                        |
-| 133                   | Control character for the button "F6"                        |
-| 134                   | Control character for the button "F7"                        |
-| 135                   | Control character for the button "F8"                        |
+| Characters (dec)      | Characters (oct)         | Description                                                  |
+| --------------------- | ------------------------ | ------------------------------------------------------------ |
+| `\27\1`               | `\033\001`               | Clear screen                                                 |
+| `\27\2\<row>`         | `\033\002\<row>`         | Set cursor to given row (1 - 20). E.g.: `\27\2\1` for row 1  |
+| `\27\3\<font>`        | `\033\003\<font>`        | 0 = normal, 1 = mono                                         |
+| `\27\4<command>\n`    | `\033\004<command>\n`    | Execute the command.<br />Example: `\27\4@set F1 CLS @cls\n` |
+| `\27\5\1`             | `\033\005\001`           | suppress further terminal output                             |
+| `\27\5\2`             | `\033\005\002`           | force the terminal output                                    |
+| `\27\6\<x>\<y>text\n` | `\033\006\<x>\<y>text\n` | Insert text on given position `x` (1 - 60) and `y` (1 - 20)  |
+| `\n`                  | `\n`                     | New line + carriage return (force terminal output)           |
+| `\t`                  | `\t`                     | Tab (up to 8 chars)                                          |
+| `\r`                  | `\r`                     | Carriage return (to rewrite line)                            |
+| `\a`                  | `\a`                     | Bell (sound)                                                 |
+| `\b`                  | `\b`                     | Clear screen                                                 |
+
+
+| Input      | Description                              |
+| ---------- | ---------------------------------------- |
+| 128        | Control character for the button "F1"    |
+| 129        | Control character for the button "F2"    |
+| 130        | Control character for the button "F3"    |
+| 131        | Control character for the button "F4"    |
+| 132        | Control character for the button "F5"    |
+| 133        | Control character for the button "F6"    |
+| 134        | Control character for the button "F7"    |
+| 135        | Control character for the button "F8"    |
+
 
 ### Hints
 

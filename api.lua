@@ -18,7 +18,6 @@ local S = termlib.S
 local SCREENSAVER_TIME = 60 * 5
 
 local function insert_str(text, pos, str)
-	print("insert_str", text, pos, str)
 	return text:sub(1, pos - 1) .. str .. text:sub(pos + str:len(), -1)
 end
 

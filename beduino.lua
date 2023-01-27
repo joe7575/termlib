@@ -19,7 +19,6 @@ local orig_putchar = beduino.lib.putchar
 
 term.send_to_cpu = function(self, pos, mem, cpu_pos, node, command)
 	if node.name == "beduino:controller" then
-		print("send_to_cpu", command)
 		local hash = minetest.hash_node_position(cpu_pos)
 		CmndBuffer[hash] = command
 		return true
