@@ -11,7 +11,7 @@
 ]]--
 
 local termlib1_c = [[
-// termlib Demo V2
+// termlib Demo V2.1
 // Connect the termlib terminal to the Beduino controller
 // and start the program with 'Execute'.
 import "sys/stdio.asm"
@@ -20,6 +20,12 @@ import "sys/os.c"
 var percent = 0;
 var prop_idx = 0;
 var prop_arr[] = {'-', '/', '|', '\'};
+
+func gotoxy(x, y) {
+  putstr("\033\006");
+  putchar(x);
+  putchar(y);
+}
 
 func init() {
   setstdout(2);  // Use external terminal for stdout
@@ -34,7 +40,7 @@ func init() {
   putstr("See: https://github.com/joe7575/termlib\n");
 
   // fill line 14 with blanks
-  putstr("\033\006\001\016");
+  gotoxy(1, 14);
   putstr("                                                     \n");
 }
 
@@ -43,7 +49,8 @@ func loop() {
   var c;
 
   // Bar graph in line 14
-  putstr("\033\006\001\016[");
+  gotoxy(1, 14);
+  putchar('[');
   for(i = 0; i < percent; i++) {
     putchar('#');
   }
@@ -52,14 +59,15 @@ func loop() {
   } else {
     putstr("]\n");
   }
-  putstr("\033\006\046\016");
+  gotoxy(38, 14);
   putnum(percent);
   putstr(" %\n");
 
   percent = (percent + 1) % 30;
 
   // Propeller in line 16
-  putstr("\033\006\001\020[");
+  gotoxy(1, 16);
+  putchar('[');
   putchar(prop_arr[prop_idx]);
   putstr("]\n");
   prop_idx = (prop_idx + 1) % 4;
@@ -67,7 +75,8 @@ func loop() {
   // Terminal input in line 18
   c = getchar();
   if(c > 0) {
-    putstr("\033\006\001\022Input: ");
+    gotoxy(1, 18);
+    putstr("Input: ");
      if(c > 127) {
       putnum(c);
     } else {
@@ -80,6 +89,7 @@ func loop() {
   }
   sleep(2);
 }
+
 ]]
 
 vm16.register_ro_file("beduino", "demo/termlib1.c", termlib1_c)
