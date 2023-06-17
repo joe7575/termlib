@@ -88,7 +88,7 @@ function Term:new_line(pos, mem)
 	if mem.trm_insert_pos then
 		mem.trm_cursor_row = mem.trm_insert_row
 		mem.trm_lines[mem.trm_cursor_row] = 
-			insert_str(mem.trm_lines[mem.trm_cursor_row], mem.trm_insert_pos, mem.trm_lines[0])
+			insert_str(mem.trm_lines[mem.trm_cursor_row] or "", mem.trm_insert_pos, mem.trm_lines[0])
 		mem.trm_lines[0] = ""
 		mem.trm_insert_pos = nil
 		mem.trm_insert_row = nil
