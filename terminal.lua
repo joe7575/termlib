@@ -13,7 +13,7 @@
 local M = minetest.get_meta
 
 local term = termlib.Term:new({
-	size_x = 60,
+	size_x = 120,
 	size_y = 20,
 	text_color = "#FFFFFF",
 	background_color = "#25516C",
