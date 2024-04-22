@@ -11,6 +11,7 @@
 ]]--
 
 local M = minetest.get_meta
+local MP = minetest.get_modpath("termlib")
 
 local term = termlib.Term:new({
 	size_x = 120,
@@ -18,9 +19,19 @@ local term = termlib.Term:new({
 	text_color = "#FFFFFF",
 	background_color = "#25516C",
 })
-termlib.term = term
 
-function termlib.formspec(pos)
+if minetest.global_exists("techage") then
+	assert(loadfile(MP .. "/techage.lua"))(term)  -- TechAge backend
+end
+if minetest.global_exists("sl_controller") then
+	assert(loadfile(MP .. "/techpack.lua"))(term)  -- TechPack backend
+end
+if minetest.global_exists("beduino") and beduino.version >= 1.0 then
+	assert(loadfile(MP .. "/beduino.lua"))(term)  -- Beduino backend
+	assert(loadfile(MP .. "/files.lua"))          -- Demo program
+end
+
+function term:formspec(pos)
 	local mem = termlib.get_mem(pos)
 	return "formspec_version[4]" ..
 		"size[12.8,10.5]" ..
@@ -63,7 +74,7 @@ minetest.register_node("termlib:terminal1", {
 		local meta = M(pos)
 		term:init_block(pos, mem)
 		termlib.preserve_cpu_pos(pos, itemstack)
-		meta:set_string("formspec", termlib.formspec(pos))
+		meta:set_string("formspec", term:formspec(pos))
 		meta:set_string("owner", placer:get_player_name())
 		meta:set_string("infotext", "Termlib Terminal")
 	end,
@@ -89,13 +100,13 @@ minetest.register_node("termlib:terminal1", {
 	on_receive_fields = function(pos, formname, fields, player)
 		local mem = termlib.get_mem(pos)
 		term:on_receive_fields(pos, fields, player, mem)
-		M(pos):set_string("formspec", termlib.formspec(pos))
+		M(pos):set_string("formspec", term:formspec(pos))
 	end,
 
 	on_rightclick = function(pos, node, clicker)
 		local mem = termlib.get_mem(pos)
 		term:trigger_ttl(pos, mem)
-		M(pos):set_string("formspec", termlib.formspec(pos))
+		M(pos):set_string("formspec", term:formspec(pos))
 	end,
 
 	after_dig_node = function(pos, oldnode, oldmetadata)

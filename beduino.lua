@@ -10,8 +10,8 @@
 	Backend for the Beduino controller
 ]]--
 
+local term = ...
 local M = minetest.get_meta
-local term = termlib.term
 
 local CmndBuffer = {}
 local orig_send_to_cpu = term.send_to_cpu
@@ -33,7 +33,7 @@ beduino.lib.putchar = function(cpu_pos, val)
 		local mem = termlib.get_mem(term_pos)
 		if mem.trm_connected then
 			if term:put_char(term_pos, mem, val) then
-				M(term_pos):set_string("formspec", termlib.formspec(term_pos))
+				M(term_pos):set_string("formspec", term:formspec(term_pos))
 				return 1, 1000
 			end
 			return 1, 200

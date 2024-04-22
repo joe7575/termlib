@@ -10,8 +10,8 @@
 	Backend for the TechPack SaferLua Controller
 ]]--
 
+local term = ...
 local M = minetest.get_meta
-local term = termlib.term
 
 local orig_send_to_cpu = term.send_to_cpu
 
@@ -48,7 +48,7 @@ sl_controller.register_action("put_str", {
 			local mem = termlib.get_mem(term_pos)
 			if mem.trm_connected then
 				if term:put_string(term_pos, mem, text) then
-					M(term_pos):set_string("formspec", termlib.formspec(term_pos))
+					M(term_pos):set_string("formspec", term:formspec(term_pos))
 				end
 			end
 		end

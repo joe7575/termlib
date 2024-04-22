@@ -22,13 +22,3 @@ dofile(MP .. "/lib.lua")  -- Helper functions
 dofile(MP .. "/api.lua")  -- Interface functions
 dofile(MP .. "/commands.lua")  -- Internal commands
 dofile(MP .. "/terminal.lua")  -- Example implementation
-if minetest.global_exists("techage") then
-	dofile(MP .. "/techage.lua")  -- TechAge backend
-end
-if minetest.global_exists("sl_controller") then
-	dofile(MP .. "/techpack.lua")  -- TechPack backend
-end
-if minetest.global_exists("beduino") and beduino.version >= 1.0 then
-	dofile(MP .. "/beduino.lua")  -- Beduino backend
-	dofile(MP .. "/files.lua")    -- Demo program
-end
