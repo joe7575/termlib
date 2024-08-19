@@ -128,10 +128,23 @@ function termlib.get_cpu_pos(term_pos)
 	return PosCache[hash]
 end
 
-function termlib.preserve_cpu_pos(pos, itemstack)
+function termlib.restore_cpu_pos(pos, itemstack)
 	local imeta = itemstack:get_meta()
 	if imeta then
 		M(pos):set_string("trm_cpu_pos", imeta:get_string("trm_cpu_pos"))
+	end
+end
+
+function termlib.preserve_metadata(pos, oldnode, oldmetadata, drops)
+	local trm_cpu_pos = oldmetadata and oldmetadata.trm_cpu_pos
+	local connected_to = oldmetadata and oldmetadata.connected_to
+	if trm_cpu_pos and connected_to then
+		local stack_meta = drops[1]:get_meta()
+		stack_meta:set_int("trm_cpu_pos", trm_cpu_pos)
+		local ndef = minetest.registered_nodes[oldnode.name]
+		if ndef and ndef.connection then
+			stack_meta:set_string("description", ndef.description .. " (connected to " .. connected_to .. ")")
+		end
 	end
 end
 

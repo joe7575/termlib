@@ -156,6 +156,10 @@ function Term:escape_sequence(pos, mem, val)
 			mem.trm_cursor_row = 0
 			mem.trm_lines[0] = ""
 			mem.trm_escaped = false
+		elseif val == 7 then
+			mem.trm_cursor_row = math.max(mem.trm_cursor_row - 1, 1)
+			mem.trm_lines[mem.trm_cursor_row] = ""
+			mem.trm_escaped = false
 		else
 			mem.trm_esc_cmnd = val
 			return false
@@ -207,6 +211,10 @@ function Term:trigger_ttl(pos, mem)
 	mem.trm_ttl = minetest.get_gametime() + SCREENSAVER_TIME
 end
 
+function Term:timeout(mem)
+	return mem.trm_ttl < minetest.get_gametime()
+end
+
 -- Function returns true, if screen needs to be updated
 function Term:put_char(pos, mem, val)
 	--print("put_char", val)
@@ -219,7 +227,8 @@ function Term:put_char(pos, mem, val)
 	else
 		mem.trm_cursor_row = mem.trm_cursor_row or 1
 		mem.trm_lines = mem.trm_lines or {}
-		if mem.trm_lines[mem.trm_cursor_row]:len() < self.size_x then
+                mem.trm_lines[mem.trm_cursor_row] = mem.trm_lines[mem.trm_cursor_row] or ""
+		if #mem.trm_lines[mem.trm_cursor_row] < self.size_x then
 			mem.trm_lines[mem.trm_cursor_row] = mem.trm_lines[mem.trm_cursor_row] .. string.char(val)
 		end
 		return false
@@ -260,51 +269,74 @@ function Term:get_char(pos, mem)
 	return val
 end
 
-function Term:fs_window(pos, mem, x, y)
+function Term:font_size(mem)
 	mem.trm_text_size = mem.trm_text_size or self.text_size
 	local font = mem.trm_font or self.font or "normal"
-	local font_size = mem.trm_text_size >= 0 and "+" .. mem.trm_text_size or tostring(mem.trm_text_size)
-	return "container[" .. x .. "," .. y .. "]" ..
-		"box[" .. self.term_size .. ";" .. self.background_color .. "]" ..
-		"style_type[textarea;font=" .. font .. ";textcolor=" .. self.text_color ..
-		";border=false;font_size="  .. font_size .. "]" ..
-		"textarea[" .. self.term_size .. ";;;" .. self:get_text(pos, mem) .. "]" ..
-		"container_end[]"
+	return mem.trm_text_size >= 0 and "+" .. mem.trm_text_size or tostring(mem.trm_text_size)
 end
 
-function Term:fs_input(pos, mem, x, y)
-	local name = mem.editing and "command" or ""
-	mem.trm_command = mem.trm_command or ""
-	return "container[" .. x .. "," .. y .. "]" ..
-		"style_type[field;textcolor=#FFFFFF]" ..
-		"button[0.0,0.8;1.3,0.7;edit;Edit]" ..
-		"field[1.4,0.7;5.5,0.7;" .. name .. ";;" .. minetest.formspec_escape(mem.trm_command) .. "]" ..
-		"button[7.0,0.7;1.7,0.7;enter;Enter]" ..
-		"field_close_on_enter[command;false]" ..
+function Term:fs_window(pos, mem, x, y)
+	local font = mem.trm_font or self.font or "normal"
+	local font_size = self:font_size(mem)
+	local fs = {
+		"container[", x, ",", y, "]",
+		"box[", self.term_size, ";", self.background_color, "]",
+		"style_type[textarea;font=", font, ";textcolor=", self.text_color,
+		";border=false;font_size=", font_size, "]",
+		"textarea[", self.term_size, ";;;", self:get_text(pos, mem), "]",
 		"container_end[]"
+	}
+	return table.concat(fs, "")
 end
 
-function Term:fs_input_with_function_keys(pos, mem, x, y)
+function Term:fs_input(pos, mem, x, y, xoffs)
 	local name = mem.editing and "command" or ""
 	mem.trm_command = mem.trm_command or ""
-	return "container[" .. x .. "," .. y .. "]" ..
-		termlib.func_key_bttns(pos, mem, 0.0, 0) ..
-		"button[0.0,0.8;1.5,0.7;esc;ESC]" ..
-		"button[1.5,0.8;1.5,0.7;edit;Edit]" ..
-		"style_type[field;textcolor=#FFFFFF]" ..
-		"field[3.1,0.8;5.78,0.7;" .. name .. ";;" .. minetest.formspec_escape(mem.trm_command) .. "]" ..
-		"button[9.0,0.8;1.5,0.7;enter;Enter]" ..
-		"button_exit[10.5,0.8;1.5,0.7;close;Close]" ..
-		"field_close_on_enter[command;false]" ..
+	xoffs = xoffs or 0
+	local fs = {
+		"container[", x, ",", y, "]",
+		"button[0.0,0.0;1.5,0.7;esc;ESC]",
+		"button[1.5,0.0;1.5,0.7;edit;Edit]",
+		"style_type[field;textcolor=#FFFFFF]",
+		"field[3.1,0.0;", (5.78 + xoffs), ",0.7;", name, ";;",
+		minetest.formspec_escape(mem.trm_command) .. "]",
+		"button[", (9.0 + xoffs), ",0.0;1.5,0.7;enter;Enter]",
+		"button_exit[", (10.5 + xoffs), ",0.0;1.5,0.7;close;Close]",
+		"field_close_on_enter[command;false]",
 		"container_end[]"
+	}
+	return table.concat(fs, "")
+end
+
+function Term:fs_input_with_function_keys(pos, mem, x, y, xoffs)
+	local name = mem.editing and "command" or ""
+	mem.trm_command = mem.trm_command or ""
+	xoffs = xoffs or 0
+	local fs = {
+		"container[", x, ",", y, "]",
+		termlib.func_key_bttns(pos, mem, 0.0, 0),
+		"button[0.0,0.8;1.5,0.7;esc;ESC]",
+		"button[1.5,0.8;1.5,0.7;edit;Edit]",
+		"style_type[field;textcolor=#FFFFFF]",
+		"field[3.1,0.8;", (5.78 + xoffs), ",0.7;", name, ";;",
+		minetest.formspec_escape(mem.trm_command), "]",
+		"button[", (8.0 + xoffs), ",0.8;1.5,0.7;enter;Enter]",
+		"button_exit[", (10.5 + xoffs), ",0.8;1.5,0.7;close;Close]",
+		"field_close_on_enter[command;false]",
+		"container_end[]"
+	}
+	return table.concat(fs, "")
 end
 
 function Term:fs_size_buttons(pos, mem, x, y)
-	return "container[" .. x .. "," .. y .. "]" ..
-		"button[0.0,0;0.6,0.6;larger;+]" ..
-		"button[0.6,0;0.6,0.6;smaller;-]" ..
-		"button[1.2,0;0.6,0.6;help;?]" ..
+	local fs = {
+		"container[", x, ",", y, "]",
+		"button[0.0,0;0.6,0.6;larger;+]",
+		"button[0.6,0;0.6,0.6;smaller;-]",
+		"button[1.2,0;0.6,0.6;help;?]",
 		"container_end[]"
+	}
+	return table.concat(fs, "")
 end
 
 function Term:command_handler(pos, mem, command)

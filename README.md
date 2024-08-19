@@ -41,6 +41,7 @@ Beduino Controllers.
 | `\27\5\1`             | suppress further terminal output                             |
 | `\27\5\2`             | force the terminal output                                    |
 | `\27\6\<x>\<y>text\n` | Insert text on given position `x` (1 - 60) and `y` (1 - 20)  |
+| `\27\7`               | Move cursor one line up                                      |
 | `\n`                  | New line + carriage return (force terminal output)           |
 | `\t`                  | Tab (up to 8 chars)                                          |
 | `\r`                  | Carriage return (to rewrite line)                            |

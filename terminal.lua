@@ -73,7 +73,7 @@ minetest.register_node("termlib:terminal1", {
 		local mem = termlib.get_mem(pos)
 		local meta = M(pos)
 		term:init_block(pos, mem)
-		termlib.preserve_cpu_pos(pos, itemstack)
+		termlib.restore_cpu_pos(pos, itemstack)
 		meta:set_string("formspec", term:formspec(pos))
 		meta:set_string("owner", placer:get_player_name())
 		meta:set_string("infotext", "Termlib Terminal")
