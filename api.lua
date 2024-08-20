@@ -371,6 +371,10 @@ function Term:on_receive_fields(pos, fields, player, mem)
 		fields = termlib.func_keys(fields)
 		--print("on_receive_fields", dump(fields))
 		self:trigger_ttl(pos, mem)
+		if fields.esc then
+			mem.editing = nil
+			return
+		end
 		if fields.edit then
 			mem.editing = true
 		else
