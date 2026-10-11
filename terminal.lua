@@ -19,6 +19,8 @@ local term = termlib.Term:new({
 	text_color = "#FFFFFF",
 	background_color = "#25516C",
 })
+-- expose the instance so other mods can provide backends
+termlib.term = term
 
 if minetest.global_exists("techage") then
 	assert(loadfile(MP .. "/techage.lua"))(term)  -- TechAge backend
