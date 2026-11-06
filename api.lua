@@ -196,6 +196,19 @@ function Term:escape_sequence(pos, mem, val)
 		elseif mem.trm_esc_cmnd == 6 then
 			mem.trm_insert_pos = math.min(val, self.size_x)
 			return false
+		elseif mem.trm_esc_cmnd == 8 then
+			-- Colour extension (client only): ESC 8 <fg>. The in-game
+			-- terminal cannot render colour, but it must consume the
+			-- sequence - otherwise the bytes would be printed literally
+			-- and shift the rest of the line.
+			mem.trm_esc_cmnd = nil
+			mem.trm_escaped = nil
+			return false
+		elseif mem.trm_esc_cmnd == 9 then
+			-- Colour extension (client only): ESC 9 <bg>, see above.
+			mem.trm_esc_cmnd = nil
+			mem.trm_escaped = nil
+			return false
 		else
 			putchar(mem, 27)
 			putchar(mem, mem.trm_esc_cmnd)
